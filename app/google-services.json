@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "699636613701",
+    "firebase_url": "https://overcomersprayers.firebaseio.com",
+    "project_id": "overcomersprayers",
+    "storage_bucket": "overcomersprayers.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:699636613701:android:ef3897d58a4b47c2",
+        "android_client_info": {
+          "package_name": "com.overcomersprayers.app.overcomersprayers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "699636613701-vu7jss1ai7754h4m8208239ckndnskvt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.overcomersprayers.app.overcomersprayers",
+            "certificate_hash": "fc4ee2ee42ec476d27026253029c1347afdfe63a"
+          }
+        },
+        {
+          "client_id": "699636613701-nqodbt99urrv9nq250osce9rpup2srtf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3ryl4r4PkDwZhUtb4W3o7bFncCj82YVc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "699636613701-nqodbt99urrv9nq250osce9rpup2srtf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
