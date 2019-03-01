@@ -6,9 +6,12 @@ import org.parceler.Parcel;
 public class Prayer {
     private String id;
     private String heading;
-    private String bibleReference;
+    private String scriptures;
     private String prayerPointsPreview;
     private String prayerPoints;
+
+    public Prayer() {
+    }
 
     public String getId() {
         return id;
@@ -18,8 +21,8 @@ public class Prayer {
         return heading;
     }
 
-    public String getBibleReference() {
-        return bibleReference;
+    public String getScriptures() {
+        return scriptures;
     }
 
     public String getPrayerPointsPreview() {

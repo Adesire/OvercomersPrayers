@@ -1,5 +1,7 @@
 package com.overcomersprayers.app.overcomersprayers;
 
+import com.overcomersprayers.app.overcomersprayers.models.Prayer;
+
 public interface Listerners {
 
 
@@ -10,4 +12,11 @@ public interface Listerners {
 
         void onPasswordResetLinkSent();
     }
+
+    interface PrayerListener {
+        void onPurchaseInitialized(Prayer prayer);
+        void onPreviewClicked(Prayer prayer);
+    }
+
+
 }
