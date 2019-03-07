@@ -54,5 +54,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'androidx.recyclerview:recyclerview:1.0.0-beta01'
     implementation 'androidx.cardview:cardview:1.0.0-beta01'
+    implementation 'com.github.Flutterwave:rave-android:1.0.35'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
 
 }

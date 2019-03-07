@@ -37,6 +37,8 @@ public class PrayerPageFragment extends Fragment {
     TextView scriptures;
     @BindView(R.id.prayerContentList)
     RecyclerView prayerContentList;
+    @BindView(R.id.toolbar_title)
+    TextView toolbarTitle;
     PrayerPageAdapter mPrayerPageAdapter;
     Prayer p;
     private DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
@@ -69,7 +71,8 @@ public class PrayerPageFragment extends Fragment {
         prayerContentList.setLayoutManager(new LinearLayoutManager(getContext()));
         mPrayerPageAdapter = new PrayerPageAdapter();
         prayerContentList.setAdapter(mPrayerPageAdapter);
-
+        toolbarTitle.setText(p.getHeading());
+        toolbarTitle.setSelected(true);
         getPrayerPoints();
     }
 

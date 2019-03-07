@@ -19,7 +19,9 @@ import android.content.Loader;
 import android.database.Cursor;
 
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
@@ -88,10 +90,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private AuthPresenter authPresenter;
     Intent i;
     boolean shouldReturnResult = false;
-    int casee;
-    public static final int CASE_DEFAULT = 999;
-    public static final int RESULT_SUCCESSFUL = 10;
-    public static final int RESULT_CANCELLED = 89;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +112,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         i = getIntent();
         if (i != null) {
             shouldReturnResult = true;
-            casee = i.getIntExtra(MainActivity.CASE, CASE_DEFAULT);
             Snackbar.make(mLoginFormView, "You have to login to continue", Snackbar.LENGTH_LONG).show();
         }
 
@@ -341,8 +338,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Toast.makeText(this, "login success", Toast.LENGTH_SHORT).show();
         if (shouldReturnResult) {
             Intent resultData = new Intent();
-            resultData.putExtra(MainActivity.CASE, casee);
-            setResult(RESULT_SUCCESSFUL, resultData);
+            setResult(RESULT_OK, resultData);
         }
         finish();
     }
@@ -372,7 +368,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     @Override
     public void onBackPressed() {
-        setResult(RESULT_CANCELLED, new Intent());
+        setResult(RESULT_CANCELED, new Intent());
         super.onBackPressed();
     }
 }
