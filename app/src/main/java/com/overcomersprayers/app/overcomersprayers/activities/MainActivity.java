@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     public void onPreviewClicked(Prayer prayer) {
         Toast.makeText(this, prayer.getHeading(), Toast.LENGTH_SHORT).show();
+        PrayerPageFragment.X=0;
         replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
     }
 
