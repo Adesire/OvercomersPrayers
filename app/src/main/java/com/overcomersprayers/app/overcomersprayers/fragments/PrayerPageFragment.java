@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.overcomersprayers.app.overcomersprayers.R;
+import com.overcomersprayers.app.overcomersprayers.activities.MainActivity;
 import com.overcomersprayers.app.overcomersprayers.activities.PrayerHeadingActivity;
 import com.overcomersprayers.app.overcomersprayers.adapters.PrayerPageAdapter;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
@@ -31,6 +32,8 @@ public class PrayerPageFragment extends Fragment {
     RecyclerView prayerContentList;
     PrayerPageAdapter mPrayerPageAdapter;
 
+    public static int X;
+
     public static PrayerPageFragment newInstance(Prayer prayer){
         PrayerPageFragment fragment = new PrayerPageFragment();
         Bundle b = new Bundle();
@@ -41,18 +44,34 @@ public class PrayerPageFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_heading_content, container, true);
+        View view = inflater.inflate(R.layout.fragment_heading_content, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
 
-    public PrayerHeadingActivity getActivityCast(){return (PrayerHeadingActivity)getActivity();}
+    public MainActivity getActivityCast(){return (MainActivity)getActivity();}
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Bundle b = getArguments();
         Prayer p = Parcels.unwrap(b.getParcelable("PRAYER_OBJECT"));
-        scriptures.setText(p.getScriptures());
+
+        String prayerHeadingString = p.getHeading().replace(". ", "");
+        prayerHeadingString = prayerHeadingString.replace(".", "");
+
+        getActivityCast().getSupportActionBar().setTitle(prayerHeadingString);
+
+        String scripturesText =null;
+        if(p.getScriptures()!= null){
+            scripturesText =  p.getScriptures().substring(0,20)+"...";
+        }else{
+            scripturesText =  "No Scripture reference";
+        }
+        if(X == 0){
+            scriptures.setText(scripturesText);
+        }else{
+            scriptures.setText(p.getScriptures());
+        }
         prayerContentList.setLayoutManager(new LinearLayoutManager(getContext()));
         mPrayerPageAdapter = new PrayerPageAdapter();
         prayerContentList.setAdapter(mPrayerPageAdapter);
