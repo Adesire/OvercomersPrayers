@@ -6,9 +6,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.overcomersprayers.app.overcomersprayers.Listerners;
@@ -17,7 +14,6 @@ import com.overcomersprayers.app.overcomersprayers.fragments.MainPageFragment;
 import com.overcomersprayers.app.overcomersprayers.fragments.PrayerPageFragment;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
 
-import org.parceler.Parcel;
 import org.parceler.Parcels;
 
 public class MainActivity extends AppCompatActivity implements Listerners.PrayerListener {

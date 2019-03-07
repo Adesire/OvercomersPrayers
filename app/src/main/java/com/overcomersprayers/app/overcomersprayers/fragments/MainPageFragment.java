@@ -68,7 +68,9 @@ public class MainPageFragment extends Fragment {
                 List<Prayer> prayers = new ArrayList<>();
                 if (dataSnapshot.getChildrenCount() > 0) {
                     for (DataSnapshot prayerSnapshot : dataSnapshot.getChildren()) {
-                        prayers.add(prayerSnapshot.getValue(Prayer.class));
+                        Prayer prayer = prayerSnapshot.getValue(Prayer.class);
+                        prayer.setId(prayerSnapshot.getKey());
+                        prayers.add(prayer);
                     }
                 }
                 refreshLayout.setRefreshing(false);

@@ -16,11 +16,12 @@
             android:id="@+id/prayer_heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat_bold"
             android:paddingLeft="8dp"
             android:paddingTop="8dp"
             android:text="Prayer Heading"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+            android:textSize="24sp"
+            />
 
         <View
             android:id="@+id/divider"
@@ -32,10 +33,11 @@
             android:id="@+id/scripture_reference"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
             android:paddingLeft="8dp"
             android:paddingBottom="8dp"
             android:text="Scripture references"
-            android:textSize="18sp" />
+            android:textSize="14sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"

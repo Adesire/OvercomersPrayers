@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="4dp"
         android:layout_margin="8dp"
-        android:elevation="4dp">
+        android:elevation="4dp"
+        app:cardCornerRadius="4dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -19,11 +20,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:paddingTop="8dp"
                 android:text="Scripture references"
                 android:textSize="30sp"
-                android:textStyle="bold"
-                android:paddingLeft="8dp"
-                android:paddingTop="8dp" />
+                android:textStyle="bold" />
 
             <View
                 android:id="@+id/divider2"
@@ -35,10 +36,10 @@
                 android:id="@+id/scriptures"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="scriptures"
-                android:textSize="18sp"
                 android:paddingLeft="8dp"
-                android:paddingBottom="8dp" />
+                android:paddingBottom="8dp"
+                android:text="scriptures"
+                android:textSize="18sp" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -47,15 +48,15 @@
         android:id="@+id/prayerContentList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:layout_weight="1"/>
+        android:paddingRight="16dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="8dp"
-        android:text="Vew More ($0.99)"/>
+        android:text="Vew More ($0.99)" />
 
 </LinearLayout>
