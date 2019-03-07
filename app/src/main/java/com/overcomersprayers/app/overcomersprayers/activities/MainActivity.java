@@ -1,8 +1,10 @@
 package com.overcomersprayers.app.overcomersprayers.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import butterknife.BindView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,11 +26,19 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     public static final String CASE = "case";
     public static final int LOGIN_REQUEST_CODE = 1099;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         replaceFragmentContent(MainPageFragment.NewInstance(), false);
+
+        /*card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
+            }
+        });*/
     }
 
     private void replaceFragmentContent(Fragment fragment, boolean shouldAddBackStack) {
@@ -50,6 +60,12 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     public void onPreviewClicked(Prayer prayer) {
         Toast.makeText(this, prayer.getHeading(), Toast.LENGTH_SHORT).show();
         PrayerPageFragment.X=0;
+        replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
+    }
+
+    @Override
+    public void onCardClicked(Prayer prayer) {
+        PrayerPageFragment.X=1;
         replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
     }
 

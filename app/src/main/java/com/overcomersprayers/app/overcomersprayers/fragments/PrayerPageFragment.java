@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.overcomersprayers.app.overcomersprayers.R;
@@ -30,6 +31,8 @@ public class PrayerPageFragment extends Fragment {
     TextView scriptures;
     @BindView(R.id.prayerContentList)
     RecyclerView prayerContentList;
+    @BindView(R.id.view_more)
+    Button viewMore;
     PrayerPageAdapter mPrayerPageAdapter;
 
     public static int X;
@@ -71,6 +74,7 @@ public class PrayerPageFragment extends Fragment {
             scriptures.setText(scripturesText);
         }else{
             scriptures.setText(p.getScriptures());
+            viewMore.setVisibility(View.GONE);
         }
         prayerContentList.setLayoutManager(new LinearLayoutManager(getContext()));
         mPrayerPageAdapter = new PrayerPageAdapter();

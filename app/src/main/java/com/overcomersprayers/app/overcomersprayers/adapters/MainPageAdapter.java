@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.overcomersprayers.app.overcomersprayers.Listerners;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,6 +65,9 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
         TextView preview;
         @BindView(R.id.purchase)
         TextView purchase;
+        @BindView(R.id.prayer_card)
+        CardView card;
+
 
         public MainPageViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -73,6 +78,7 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
             if (p <= 2) {
                 preview.setVisibility(View.GONE);
                 purchase.setVisibility(View.GONE);
+                card.setOnClickListener(v -> prayerListener.onCardClicked(prayer));
             } else {
                 preview.setVisibility(View.VISIBLE);
                 purchase.setVisibility(View.VISIBLE);
@@ -82,8 +88,11 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
             String prayerHeadingString = prayer.getHeading().replace(". ", "");
             prayerHeadingString = prayerHeadingString.replace(".", "");
             prayerHeading.setText(prayerHeadingString);
-            if (prayer.getScriptures() != null) {
+            if (prayer.getScriptures() != null && preview.getVisibility() == View.GONE && purchase.getVisibility() == View.GONE) {
                 scriptureReference.setText(prayer.getScriptures());
+            }else if(prayer.getScriptures() != null){
+                String scriptureCut = prayer.getScriptures().substring(0,20)+"....";
+                scriptureReference.setText(scriptureCut);
             }
         }
 
