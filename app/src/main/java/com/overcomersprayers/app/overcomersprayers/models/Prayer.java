@@ -32,4 +32,8 @@ public class    Prayer {
     public String getPrayerPoints() {
         return prayerPoints;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }
