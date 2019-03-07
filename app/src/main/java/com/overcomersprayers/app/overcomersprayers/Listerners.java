@@ -16,6 +16,7 @@ public interface Listerners {
     interface PrayerListener {
         void onPurchaseInitialized(Prayer prayer);
         void onPreviewClicked(Prayer prayer);
+        void onCardClicked(Prayer prayer);
     }
 
 

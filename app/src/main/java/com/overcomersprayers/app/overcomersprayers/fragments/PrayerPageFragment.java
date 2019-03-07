@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -14,6 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.R;
+import com.overcomersprayers.app.overcomersprayers.activities.MainActivity;
 import com.overcomersprayers.app.overcomersprayers.activities.PrayerHeadingActivity;
 import com.overcomersprayers.app.overcomersprayers.adapters.PrayerPageAdapter;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
@@ -39,11 +41,17 @@ public class PrayerPageFragment extends Fragment {
     RecyclerView prayerContentList;
     @BindView(R.id.toolbar_title)
     TextView toolbarTitle;
+    @BindView(R.id.view_more)
+    Button viewMore;
     PrayerPageAdapter mPrayerPageAdapter;
     Prayer p;
     private DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
-    public static PrayerPageFragment newInstance(Prayer prayer) {
+
+    public static int X;
+
+    public static PrayerPageFragment newInstance(Prayer prayer){
+
         PrayerPageFragment fragment = new PrayerPageFragment();
         Bundle b = new Bundle();
         b.putParcelable("PRAYER_OBJECT", Parcels.wrap(prayer));
@@ -59,15 +67,32 @@ public class PrayerPageFragment extends Fragment {
         return view;
     }
 
-    public PrayerHeadingActivity getActivityCast() {
-        return (PrayerHeadingActivity) getActivity();
-    }
+    public MainActivity getActivityCast(){return (MainActivity)getActivity();}
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Bundle b = getArguments();
-        p = Parcels.unwrap(b.getParcelable("PRAYER_OBJECT"));
-        scriptures.setText(p.getScriptures());
+
+        Prayer p = Parcels.unwrap(b.getParcelable("PRAYER_OBJECT"));
+
+        String prayerHeadingString = p.getHeading().replace(". ", "");
+        prayerHeadingString = prayerHeadingString.replace(".", "");
+
+        getActivityCast().getSupportActionBar().setTitle(prayerHeadingString);
+
+        String scripturesText =null;
+        if(p.getScriptures()!= null){
+            scripturesText =  p.getScriptures().substring(0,20)+"...";
+        }else{
+            scripturesText =  "No Scripture reference";
+        }
+        if(X == 0){
+            scriptures.setText(scripturesText);
+        }else{
+            scriptures.setText(p.getScriptures());
+            viewMore.setVisibility(View.GONE);
+        }
         prayerContentList.setLayoutManager(new LinearLayoutManager(getContext()));
         mPrayerPageAdapter = new PrayerPageAdapter();
         prayerContentList.setAdapter(mPrayerPageAdapter);

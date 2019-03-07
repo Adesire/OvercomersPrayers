@@ -3,6 +3,7 @@ package com.overcomersprayers.app.overcomersprayers.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import okhttp3.MediaType;
@@ -12,6 +13,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     Retrofit retrofit;
     Transactions transactions;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +69,13 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                 .build();
 
         replaceFragmentContent(MainPageFragment.NewInstance(), false);
+
+        /*card.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
+            }
+        });*/
     }
 
     private void replaceFragmentContent(Fragment fragment, boolean shouldAddBackStack) {
@@ -90,6 +100,13 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
 
     @Override
     public void onPreviewClicked(Prayer prayer) {
+        PrayerPageFragment.X=0;
+        replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
+    }
+
+    @Override
+    public void onCardClicked(Prayer prayer) {
+        PrayerPageFragment.X=1;
         replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
     }
 

@@ -78,6 +78,7 @@
         android:paddingRight="16dp" />
 
     <Button
+        android:id="@+id/view_more"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
