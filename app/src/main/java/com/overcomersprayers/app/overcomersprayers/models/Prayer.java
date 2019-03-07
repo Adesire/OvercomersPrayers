@@ -3,7 +3,7 @@ package com.overcomersprayers.app.overcomersprayers.models;
 import org.parceler.Parcel;
 
 @Parcel(Parcel.Serialization.BEAN)
-public class Prayer {
+public class    Prayer {
     private String id;
     private String heading;
     private String scriptures;
