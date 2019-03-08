@@ -1,7 +1,10 @@
 package com.overcomersprayers.app.overcomersprayers;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,12 +54,17 @@ public class AuthPresenter {
         mAuth.createUserWithEmailAndPassword(user.getEmail(), password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser firebaseUser = task.getResult().getUser();
-                user.setId(firebaseUser.getUid());
-                reference.child(Users.getTableName()).child(firebaseUser.getUid()).setValue(user).addOnCompleteListener(task1 -> {
-                    if (task1.isSuccessful()) {
-                        mAuthListener.onAuthSuccess();
-                    } else {
-                        mAuthListener.onAuthFailed(task1.getException().getMessage());
+                UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(user.getFirstName().concat(":::").concat(user.getLastName())).build();
+                firebaseUser.updateProfile(profileChangeRequest).addOnCompleteListener(task12 -> {
+                    if (task12.isSuccessful()){
+                        user.setId(firebaseUser.getUid());
+                        reference.child(Users.getTableName()).child(firebaseUser.getUid()).setValue(user).addOnCompleteListener(task1 -> {
+                            if (task1.isSuccessful()) {
+                                mAuthListener.onAuthSuccess();
+                            } else {
+                                mAuthListener.onAuthFailed(task1.getException().getMessage());
+                            }
+                        });
                     }
                 });
 

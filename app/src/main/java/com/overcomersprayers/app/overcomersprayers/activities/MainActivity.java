@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import pl.droidsonroids.gif.GifImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -15,10 +16,14 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flutterwave.raveandroid.RaveConstants;
@@ -33,6 +38,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.JsonObject;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
+import com.overcomersprayers.app.overcomersprayers.PaymentPresenter;
 import com.overcomersprayers.app.overcomersprayers.R;
 import com.overcomersprayers.app.overcomersprayers.RaveApi;
 import com.overcomersprayers.app.overcomersprayers.fragments.MainPageFragment;
@@ -45,17 +51,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcels;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements Listerners.PrayerListener {
+public class MainActivity extends AppCompatActivity implements Listerners.PrayerListener, Listerners.PaymentListener {
     public static final int LOGIN_REQUEST_CODE = 1099;
     FirebaseAuth firebaseAuth;
     FirebaseUser mUser;
     Prayer currentPrayerSelected;
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-    private ProgressDialog progressDialog;
     Retrofit retrofit;
     Transactions transactions;
+    PaymentPresenter paymentPresenter;
+    AlertDialog.Builder alertDialogBuilder;
+    AlertDialog alertDialog;
+    GifImageView gifImageView;
+    TextView paymentStatusTextView;
+    ProgressDialog progressDialog;
 
 
     @Override
@@ -63,13 +76,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //FirebaseAuth.getInstance().signOut();
-        retrofit = new Retrofit.Builder()
-                .baseUrl(RaveApi.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
         replaceFragmentContent(MainPageFragment.NewInstance(), false);
-
+        progressDialog = new ProgressDialog(this);
         /*card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,15 +106,26 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
 
     }
 
+    private void initializePayment() {
+        transactions = new Transactions("", 1, currentPrayerSelected.getId());
+        if (paymentPresenter == null) {
+            paymentPresenter = new PaymentPresenter(this, transactions, this);
+        } else
+            paymentPresenter.setNewTransaction(transactions);
+        progressDialog.setMessage("Initializing transaction, Please wait...");
+        progressDialog.show();
+        paymentPresenter.initializePayment();
+    }
+
     @Override
     public void onPreviewClicked(Prayer prayer) {
-        PrayerPageFragment.X=0;
+        PrayerPageFragment.X = 0;
         replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
     }
 
     @Override
     public void onCardClicked(Prayer prayer) {
-        PrayerPageFragment.X=1;
+        PrayerPageFragment.X = 1;
         replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
     }
 
@@ -134,8 +153,17 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         } else if (requestCode == RaveConstants.RAVE_REQUEST_CODE && data != null) {
             String message = data.getStringExtra("response");
             if (resultCode == RavePayActivity.RESULT_SUCCESS) {
-                verifyPayment();
-                Toast.makeText(this, "SUCCESS " + message, Toast.LENGTH_SHORT).show();
+                alertDialogBuilder = new AlertDialog.Builder(this);
+                View view = getLayoutInflater().inflate(R.layout.payment_verification_dialog, null, false);
+                gifImageView = view.findViewById(R.id.loading_image);
+                paymentStatusTextView = view.findViewById(R.id.status_text_view);
+                alertDialogBuilder.setCancelable(false)
+                        .setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss());
+                alertDialogBuilder.setView(view);
+                alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                paymentPresenter.verifyPayment();
+                //Toast.makeText(this, "SUCCESS " + message, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RavePayActivity.RESULT_ERROR) {
                 Toast.makeText(this, "ERROR " + message, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RavePayActivity.RESULT_CANCELLED) {
@@ -144,61 +172,49 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         }
     }
 
-    private void verifyPayment() {
-        JSONObject jsonObject;
-        jsonObject = new JSONObject();
-        try {
-            jsonObject.put("txref", transactions.getTrxRef());
-            jsonObject.put("SECKEY", "FLWSECK_TEST-0f31c54c2fe862c29694c1cc45e27c12-X");
-        } catch (JSONException e) {
-            e.printStackTrace();
+    @Override
+    public void onPaymentInitialized(String key) {
+        String displayName = mUser.getDisplayName();
+        String firstname = "";
+        String lastName = "";
+        if (displayName != null || !TextUtils.isEmpty(displayName)) {
+            String fullname[] = displayName.split(":::");
+            firstname = fullname[0];
+            lastName = fullname[1];
         }
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
-        Call<RaveResponse> raveResponseCall = retrofit.create(RaveApi.class).getRaveResponse(requestBody);
-        raveResponseCall.enqueue(new Callback<RaveResponse>() {
-            @Override
-            public void onResponse(Call<RaveResponse> call, Response<RaveResponse> response) {
-                Log.e("LOG", response.body().toString());
-            }
-
-            @Override
-            public void onFailure(Call<RaveResponse> call, Throwable t) {
-
-            }
-        });
+        if (progressDialog.isShowing())
+            progressDialog.dismiss();
+        new RavePayManager(this)
+                .setAmount(transactions.getAmount())
+                .setCurrency("USD")
+                .setCountry("NG")
+                .setfName(firstname)
+                .setlName(lastName)
+                .setEmail(mUser.getEmail())
+                .setTxRef(key)
+                .setEncryptionKey("FLWSECK_TEST0963fcaa831e")
+                .setPublicKey("FLWPUBK_TEST-3d6789e869a4b16248acae3c1de9f649-X")
+                .onStagingEnv(true)
+                .allowSaveCardFeature(true)
+                .acceptCardPayments(true)
+                .setNarration("Payment for prayer")
+                .initialize();
     }
 
-    private void initializePayment() {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setCancelable(false);
+    @Override
+    public void onPaymentError(String errorMessage) {
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+        if (alertDialog != null) {
+            gifImageView.setVisibility(View.GONE);
+            paymentStatusTextView.setText(errorMessage);
         }
-        progressDialog.setMessage("Initializing transaction, Please wait...");
-        progressDialog.show();
-        DatabaseReference userTransactionRef = rootRef.child("transactions").child(mUser.getUid());
-        String key = userTransactionRef.push().getKey();
-        String uuid = UUID.randomUUID().toString();
-        transactions = new Transactions(uuid, 1, currentPrayerSelected.getId());
-        userTransactionRef.child(key).updateChildren(transactions.toMap()).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                new RavePayManager(MainActivity.this)
-                        .setAmount(transactions.getAmount())
-                        .setCurrency("USD")
-                        .setCountry("NG")
-                        .setfName("name")
-                        .setlName("lname")
-                        .setEmail(mUser.getEmail())
-                        .setTxRef(uuid)
-                        .setEncryptionKey("FLWSECK_TEST0963fcaa831e")
-                        .setPublicKey("FLWPUBK_TEST-3d6789e869a4b16248acae3c1de9f649-X")
-                        .onStagingEnv(true)
-                        .allowSaveCardFeature(true)
-                        .acceptCardPayments(true)
-                        .setNarration("Narration")
-                        .initialize();
-            }
-        });
     }
 
-
+    @Override
+    public void onPaymentCompleted(boolean wasSuccessful) {
+        if (wasSuccessful) {
+            gifImageView.setImageResource(R.drawable.praise);
+            paymentStatusTextView.setText(getString(R.string.payment_successful));
+        }
+    }
 }

@@ -15,9 +15,18 @@ public interface Listerners {
 
     interface PrayerListener {
         void onPurchaseInitialized(Prayer prayer);
+
         void onPreviewClicked(Prayer prayer);
+
         void onCardClicked(Prayer prayer);
     }
 
+    interface PaymentListener {
+        void onPaymentInitialized(String key);
+
+        void onPaymentError(String errorMessage);
+
+        void onPaymentCompleted(boolean wasSuccessful);
+    }
 
 }
