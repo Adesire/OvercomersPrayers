@@ -1,19 +1,9 @@
 package com.overcomersprayers.app.overcomersprayers.activities;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 import pl.droidsonroids.gif.GifImageView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 
 import android.app.AlertDialog;
@@ -21,47 +11,28 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flutterwave.raveandroid.RaveConstants;
 import com.flutterwave.raveandroid.RavePayActivity;
-import com.flutterwave.raveandroid.RavePayInitializer;
 import com.flutterwave.raveandroid.RavePayManager;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.gson.JsonObject;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.PaymentPresenter;
 import com.overcomersprayers.app.overcomersprayers.R;
-import com.overcomersprayers.app.overcomersprayers.RaveApi;
 import com.overcomersprayers.app.overcomersprayers.fragments.MainPageFragment;
 import com.overcomersprayers.app.overcomersprayers.fragments.PrayerPageFragment;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
-import com.overcomersprayers.app.overcomersprayers.models.RaveResponse;
 import com.overcomersprayers.app.overcomersprayers.models.Transactions;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.parceler.Parcels;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements Listerners.PrayerListener, Listerners.PaymentListener {
     public static final int LOGIN_REQUEST_CODE = 1099;
-    FirebaseAuth firebaseAuth;
     FirebaseUser mUser;
     Prayer currentPrayerSelected;
-    DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-    Retrofit retrofit;
     Transactions transactions;
     PaymentPresenter paymentPresenter;
     AlertDialog.Builder alertDialogBuilder;
