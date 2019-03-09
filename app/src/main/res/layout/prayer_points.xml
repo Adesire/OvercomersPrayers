@@ -31,7 +31,8 @@
             android:fontFamily="@font/montserrat"
             android:padding="8dp"
             android:text="First Point"
-            android:textSize="14sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

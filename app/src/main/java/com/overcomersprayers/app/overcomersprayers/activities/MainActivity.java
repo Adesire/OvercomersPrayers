@@ -78,12 +78,6 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         //FirebaseAuth.getInstance().signOut();
         replaceFragmentContent(MainPageFragment.NewInstance(), false);
         progressDialog = new ProgressDialog(this);
-        /*card.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
-            }
-        });*/
     }
 
     private void replaceFragmentContent(Fragment fragment, boolean shouldAddBackStack) {

@@ -51,7 +51,6 @@ public class PrayerPageFragment extends Fragment {
     public static int X;
 
     public static PrayerPageFragment newInstance(Prayer prayer){
-
         PrayerPageFragment fragment = new PrayerPageFragment();
         Bundle b = new Bundle();
         b.putParcelable("PRAYER_OBJECT", Parcels.wrap(prayer));
@@ -72,6 +71,7 @@ public class PrayerPageFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Bundle bool = new Bundle();
         Bundle b = getArguments();
 
         Prayer p = Parcels.unwrap(b.getParcelable("PRAYER_OBJECT"));
@@ -79,9 +79,7 @@ public class PrayerPageFragment extends Fragment {
         String prayerHeadingString = p.getHeading().replace(". ", "");
         prayerHeadingString = prayerHeadingString.replace(".", "");
 
-        getActivityCast().getSupportActionBar().setTitle(prayerHeadingString);
-
-        String scripturesText =null;
+        String scripturesText = null;
         if(p.getScriptures()!= null){
             scripturesText =  p.getScriptures().substring(0,20)+"...";
         }else{
@@ -89,19 +87,21 @@ public class PrayerPageFragment extends Fragment {
         }
         if(X == 0){
             scriptures.setText(scripturesText);
+            bool.putBoolean("IS_LOCKED",true);
+
         }else{
             scriptures.setText(p.getScriptures());
             viewMore.setVisibility(View.GONE);
         }
         prayerContentList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mPrayerPageAdapter = new PrayerPageAdapter();
+        mPrayerPageAdapter = new PrayerPageAdapter(bool);
         prayerContentList.setAdapter(mPrayerPageAdapter);
-        toolbarTitle.setText(p.getHeading());
+        toolbarTitle.setText(prayerHeadingString);
         toolbarTitle.setSelected(true);
-        getPrayerPoints();
+        getPrayerPoints(p);
     }
 
-    private void getPrayerPoints() {
+    private void getPrayerPoints(Prayer p) {
         rootRef.child("prayerpoints").child(p.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

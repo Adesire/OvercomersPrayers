@@ -2,6 +2,7 @@ package com.overcomersprayers.app.overcomersprayers.adapters;
 
 import android.graphics.BlurMaskFilter;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +22,10 @@ import butterknife.ButterKnife;
 
 public class PrayerPageAdapter extends RecyclerView.Adapter<PrayerPageAdapter.PrayerPageViewHolder> {
     List<String> prayerPoints;
+    private boolean a;
 
-    public PrayerPageAdapter() {
+    public PrayerPageAdapter(Bundle b) {
+        this.a = b.getBoolean("IS_LOCKED");
         this.prayerPoints = new ArrayList<>();
     }
 
@@ -63,16 +66,24 @@ public class PrayerPageAdapter extends RecyclerView.Adapter<PrayerPageAdapter.Pr
         void bind(int position) {
             prayerPointTextview.setText(prayerPoints.get(position));
             serialNumber.setText(String.valueOf(position + 1));
-            if (position > 2) {
-                if (Build.VERSION.SDK_INT >= 11) {
-                    prayerPointTextview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            if(a){
+                if (position > 2) {
+                    if (Build.VERSION.SDK_INT >= 11) {
+                        prayerPointTextview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                    }
+                    float radius = prayerPointTextview.getTextSize() / 3;
+                    BlurMaskFilter filter = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);
+                    prayerPointTextview.getPaint().setMaskFilter(filter);
+                } else {
+                    prayerPointTextview.getPaint().setMaskFilter(null);
                 }
-                float radius = prayerPointTextview.getTextSize() / 3;
-                BlurMaskFilter filter = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);
-                prayerPointTextview.getPaint().setMaskFilter(filter);
-            } else {
+            }else{
                 prayerPointTextview.getPaint().setMaskFilter(null);
             }
+        }
+
+        void setBlurryText(int position){
+
         }
     }
 }
