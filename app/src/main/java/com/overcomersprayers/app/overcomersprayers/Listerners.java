@@ -33,4 +33,8 @@ public interface Listerners {
         void onTransactionItemClicked(Transactions transactions);
     }
 
+    interface SearchListener {
+        void onPrayerSearched(String query);
+    }
+
 }

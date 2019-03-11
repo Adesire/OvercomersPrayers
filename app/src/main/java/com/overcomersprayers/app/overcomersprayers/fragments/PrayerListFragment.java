@@ -3,6 +3,7 @@ package com.overcomersprayers.app.overcomersprayers.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PrayerListFragment extends Fragment {
+public class PrayerListFragment extends Fragment implements Listerners.SearchListener {
 
     private static final String LOG_TAG = PrayerListFragment.class.getSimpleName();
     @BindView(R.id.prayerHeadingList)
@@ -39,6 +40,7 @@ public class PrayerListFragment extends Fragment {
     MainPageAdapter mainPageAdapter;
     Listerners.PrayerListener prayerListener;
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+    public static Listerners.SearchListener sSearchListener;
 
     public static PrayerListFragment NewInstance() {
         return new PrayerListFragment();
@@ -94,5 +96,11 @@ public class PrayerListFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         prayerListener = (Listerners.PrayerListener) context;
+        sSearchListener = this;
+    }
+
+    @Override
+    public void onPrayerSearched(String query) {
+        Log.e("TAAAAG1", query);
     }
 }

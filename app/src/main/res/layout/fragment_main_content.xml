@@ -6,51 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/toolbar_title"
-                    style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ellipsize="marquee"
-                    android:fontFamily="@font/montserrat"
-                    android:marqueeRepeatLimit="marquee_forever"
-                    android:scrollHorizontally="true"
-                    android:text="@string/app_name"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/main_login_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:fontFamily="@font/montserrat"
-                    android:onClick="signIn"
-                    android:text="@string/action_sign_in"
-                    android:textColor="@color/white" />
-
-            </LinearLayout>
-
-        </androidx.appcompat.widget.Toolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
 
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

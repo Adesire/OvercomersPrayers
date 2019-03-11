@@ -2,6 +2,9 @@ package com.overcomersprayers.app.overcomersprayers.activities;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -16,10 +19,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.flutterwave.raveandroid.RaveConstants;
 import com.flutterwave.raveandroid.RavePayActivity;
@@ -66,7 +74,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     float d;
     int marginBottomInDp;
     ConstraintLayout.LayoutParams params;
-
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -108,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         //FirebaseAuth.getInstance().signOut();
         navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         replaceFragmentContent(PrayerListFragment.NewInstance(), false);
+        setSupportActionBar(mToolbar);
         progressDialog = new ProgressDialog(this);
         d = getResources().getDisplayMetrics().density;
         marginBottomInDp = (int) d * 56;
@@ -284,9 +294,34 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
 
-    public void signIn(View view) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        MenuItem item = menu.findItem(R.id.app_bar_search);
+        SearchView searchView = (SearchView) item.getActionView();
+        searchView.setQueryHint("Search Prayers");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //Log.e("TAAAAG1", query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //Log.e("TAAAAG1", newText);
+                PrayerListFragment.sSearchListener.onPrayerSearched(newText);
+                return false;
+            }
+        });
+        return true;
+    }
+
+
+    public void signIn(MenuItem item) {
         Intent intent = new Intent(this, LoginActivity.class);
-        if (view == null)
+        if (item == null)
             intent.putExtra(CASE, CASE_LOGIN_THEN_PAY);
         else
             intent.putExtra(CASE, CASE_LOGIN_NORMAL);
