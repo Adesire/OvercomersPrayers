@@ -15,7 +15,7 @@
         <bitmap
             android:layout_gravity="center"
             android:gravity="center"
-            android:src="@drawable/ic_overcomers_prayers"
+            android:src="@drawable/opbg"
             android:tileMode="disabled" />
     </item>
 

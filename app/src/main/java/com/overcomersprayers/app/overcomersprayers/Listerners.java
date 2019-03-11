@@ -1,6 +1,7 @@
 package com.overcomersprayers.app.overcomersprayers;
 
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
+import com.overcomersprayers.app.overcomersprayers.models.Transactions;
 
 public interface Listerners {
 
@@ -27,6 +28,9 @@ public interface Listerners {
         void onPaymentError(String errorMessage);
 
         void onPaymentCompleted(boolean wasSuccessful);
+    }
+    interface TransactionsItemListener {
+        void onTransactionItemClicked(Transactions transactions);
     }
 
 }
