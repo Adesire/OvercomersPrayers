@@ -85,6 +85,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="8dp"
-        android:text="Vew More ($0.99)" />
+        android:text="View More ($0.99)" />
 
 </LinearLayout>
