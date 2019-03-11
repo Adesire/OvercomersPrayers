@@ -3,7 +3,6 @@ package com.overcomersprayers.app.overcomersprayers.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
-import com.overcomersprayers.app.overcomersprayers.activities.MainActivity;
 import com.overcomersprayers.app.overcomersprayers.adapters.MainPageAdapter;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
 
@@ -25,16 +23,15 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainPageFragment extends Fragment {
+public class PrayerListFragment extends Fragment {
 
-    private static final String LOG_TAG = MainPageFragment.class.getSimpleName();
+    private static final String LOG_TAG = PrayerListFragment.class.getSimpleName();
     @BindView(R.id.prayerHeadingList)
     RecyclerView prayerHeadingList;
     @BindView(R.id.swipe_refresh)
@@ -43,8 +40,8 @@ public class MainPageFragment extends Fragment {
     Listerners.PrayerListener prayerListener;
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
-    public static MainPageFragment NewInstance() {
-        return new MainPageFragment();
+    public static PrayerListFragment NewInstance() {
+        return new PrayerListFragment();
     }
 
     @Override
@@ -56,7 +53,7 @@ public class MainPageFragment extends Fragment {
         refreshLayout.setOnRefreshListener(this::getPrayers);
         refreshLayout.setRefreshing(true);
         getPrayers();
-//        prayerHeadingList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+//      prayerHeadingList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
 
     }

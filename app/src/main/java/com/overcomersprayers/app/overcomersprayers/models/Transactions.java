@@ -23,6 +23,7 @@ public class Transactions {
     private String prayerId;
     private String raveRef;
     private String trxKey;
+    private String prayerHeading;
 
     public Transactions() {
     }
@@ -125,6 +126,14 @@ public class Transactions {
         this.hasBeenUpdated = hasBeenUpdated;
     }
 
+    public String getPrayerHeading() {
+        return prayerHeading;
+    }
+
+    public void setPrayerHeading(String prayerHeading) {
+        this.prayerHeading = prayerHeading;
+    }
+
     public static String getTableName() {
         return "transactions";
     }
@@ -142,6 +151,7 @@ public class Transactions {
         data.put("flwRef", flwRef);
         data.put("raveRef", raveRef);
         data.put("trxKey", trxKey);
+        data.put("prayerHeading", prayerHeading);
         return data;
     }
 

@@ -90,6 +90,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private AuthPresenter authPresenter;
     Intent i;
     boolean shouldReturnResult = false;
+    int casee = MainActivity.CASE_DEFAULT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +112,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
         i = getIntent();
         if (i != null) {
+            casee = i.getIntExtra(MainActivity.CASE, MainActivity.CASE_DEFAULT);
             shouldReturnResult = true;
             Snackbar.make(mLoginFormView, "You have to login to continue", Snackbar.LENGTH_LONG).show();
         }
@@ -338,6 +340,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Toast.makeText(this, "login success", Toast.LENGTH_SHORT).show();
         if (shouldReturnResult) {
             Intent resultData = new Intent();
+            resultData.putExtra(MainActivity.CASE, casee);
             setResult(RESULT_OK, resultData);
         }
         finish();
