@@ -2,12 +2,13 @@ package com.overcomersprayers.app.overcomersprayers.activities;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.droidsonroids.gif.GifImageView;
-
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -17,7 +18,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     ProgressDialog progressDialog;
     @BindView(R.id.navigation)
     BottomNavigationView navigationView;
+    @BindView(R.id.main_acivity_content)
+    View mainView;
     public static int CASE_DEFAULT = 192;
     public static int CASE_LOGIN_NORMAL = 195;
     public static final int CASE_LOGIN_THEN_PAY = 196;
@@ -59,6 +61,11 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     public static final String FRAGMENT_TRANSACTION = "transaction";
     public static final String FRAGMENT_PRAYER_STORE = "prayer_store";
     public static String CURRENT_FRAGMENT = FRAGMENT_HOME;
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    boolean isNavigationBarHidden;
+    float d;
+    int marginBottomInDp;
+    ConstraintLayout.LayoutParams params;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -102,7 +109,12 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         replaceFragmentContent(PrayerListFragment.NewInstance(), false);
         progressDialog = new ProgressDialog(this);
+        d = getResources().getDisplayMetrics().density;
+        marginBottomInDp = (int) d * 56;
+        params = (ConstraintLayout.LayoutParams) mainView.getLayoutParams();
+
     }
+
 
     private void replaceFragmentContent(Fragment fragment, boolean shouldAddBackStack) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -159,10 +171,26 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         super.onStart();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser == null) {
-            navigationView.setVisibility(View.GONE);
+            isNavigationBarHidden = false;
         } else {
-            navigationView.setVisibility(View.VISIBLE);
+            fragmentManager.addOnBackStackChangedListener(this::toggleBottomNavVisibility);
+            isNavigationBarHidden = true;
         }
+        toggleBottomNavVisibility();
+    }
+
+
+    private void toggleBottomNavVisibility() {
+        if (isNavigationBarHidden) {
+            navigationView.setVisibility(View.VISIBLE);
+            params.setMargins(0, 0, 0, marginBottomInDp);
+
+        } else {
+            navigationView.setVisibility(View.GONE);
+            params.setMargins(0, 0, 0, 0);
+        }
+        isNavigationBarHidden = !isNavigationBarHidden;
+        mainView.setLayoutParams(params);
     }
 
     @Override
@@ -234,6 +262,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                 .allowSaveCardFeature(true)
                 .acceptCardPayments(true)
                 .setNarration("Payment for prayer")
+                .withTheme(R.style.RaveTheme)
                 .initialize();
     }
 

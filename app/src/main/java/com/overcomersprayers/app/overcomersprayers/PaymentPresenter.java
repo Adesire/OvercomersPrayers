@@ -98,6 +98,7 @@ public class PaymentPresenter {
                             endTransaction(false);
                         }
                     } else {
+                        Log.e(LOG_TAG, "rave response is empty for transaction: " + transactions.getTrxRef());
                         paymentListener.onPaymentError(mContext.getString(R.string.payment_status_error));
                     }
                 }
