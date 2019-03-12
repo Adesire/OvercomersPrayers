@@ -21,14 +21,33 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="8dp"
-                android:paddingTop="8dp"
-                android:text="Scripture references"
-                android:textSize="30sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/scripture_references"
+                    android:textSize="30sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/favourite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:paddingBottom="4dp"
+                    android:layout_gravity="bottom"
+                    android:clickable="true"
+                    android:drawableStart="@drawable/fav_toggle"
+                    app:srcCompat="@android:drawable/btn_star_big_off"
+                    android:focusable="true" />
+
+            </LinearLayout>
 
             <View
                 android:id="@+id/divider2"

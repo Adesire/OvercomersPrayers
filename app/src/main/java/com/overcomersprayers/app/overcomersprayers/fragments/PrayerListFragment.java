@@ -1,11 +1,14 @@
 package com.overcomersprayers.app.overcomersprayers.fragments;
 
 
+import android.animation.Animator;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,6 +28,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,6 +39,8 @@ import butterknife.ButterKnife;
 public class PrayerListFragment extends Fragment implements Listerners.SearchListener {
 
     private static final String LOG_TAG = PrayerListFragment.class.getSimpleName();
+    private static final String MOTION_X_ARG = null;
+    private static final String MOTION_Y_ARG = null ;
     @BindView(R.id.prayerHeadingList)
     RecyclerView prayerHeadingList;
     @BindView(R.id.swipe_refresh)

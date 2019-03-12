@@ -34,11 +34,13 @@ import com.flutterwave.raveandroid.RaveConstants;
 import com.flutterwave.raveandroid.RavePayActivity;
 import com.flutterwave.raveandroid.RavePayManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.PaymentPresenter;
 import com.overcomersprayers.app.overcomersprayers.R;
+import com.overcomersprayers.app.overcomersprayers.fragments.PrayerFavouriteFragment;
 import com.overcomersprayers.app.overcomersprayers.fragments.PrayerListFragment;
 import com.overcomersprayers.app.overcomersprayers.fragments.PrayerPageFragment;
 import com.overcomersprayers.app.overcomersprayers.fragments.PrayerStoreFragment;
@@ -82,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     ConstraintLayout.LayoutParams params;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -134,12 +138,16 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         marginBottomInDp = (int) d * 56;
         params = (ConstraintLayout.LayoutParams) mainView.getLayoutParams();
         //mToolbar.setTitle(getString(R.string.app_name));
+
         setToolbarTitle(getString(R.string.app_name));
         fragmentManager.addOnBackStackChangedListener(() -> {
             if (fragmentManager.getBackStackEntryCount() < 1)
                 setToolbarTitle(getString(R.string.app_name));
             toggleBottomNavVisibility();
+
         });
+
+        fab.setOnClickListener(view -> onFabClicked());
     }
 
     @Override
@@ -323,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         if (wasSuccessful) {
             gifImageView.setImageResource(R.drawable.praise);
             paymentStatusTextView.setText(getString(R.string.payment_successful));
-        }else {
+        } else {
             gifImageView.setVisibility(View.GONE);
             paymentStatusTextView.setText(message);
         }
@@ -366,4 +374,9 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
             intent.putExtra(CASE, CASE_LOGIN_NORMAL);
         startActivityForResult(intent, LOGIN_REQUEST_CODE);
     }
+
+    private void onFabClicked() {
+        replaceFragmentContent(PrayerFavouriteFragment.NewInstance(), true);
+    }
+
 }

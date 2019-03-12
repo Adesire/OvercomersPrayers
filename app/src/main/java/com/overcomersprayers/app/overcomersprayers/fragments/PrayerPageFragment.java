@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -43,8 +44,10 @@ public class PrayerPageFragment extends Fragment {
     TextView toolbarTitle;
     @BindView(R.id.view_more)
     Button viewMore;
+    @BindView(R.id.favourite)
+    ImageView favourite;
     PrayerPageAdapter mPrayerPageAdapter;
-    Prayer p;
+    List<Prayer> favouritedPrayers = new ArrayList<>();
     private DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
 
@@ -79,7 +82,6 @@ public class PrayerPageFragment extends Fragment {
         prayerHeadingString = prayerHeadingString.replace(".", "");
         getActivityCast().setToolbarTitle(prayerHeadingString);
 
-        //().getSupportActionBar().
 
         String scripturesText = null;
         if(p.getScriptures()!= null){
@@ -101,6 +103,8 @@ public class PrayerPageFragment extends Fragment {
         toolbarTitle.setText(prayerHeadingString);
         toolbarTitle.setSelected(true);
         getPrayerPoints(p);
+
+        onFavouriteClicked();
     }
 
     private void getPrayerPoints(Prayer p) {
@@ -120,6 +124,15 @@ public class PrayerPageFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+    }
+
+    private void onFavouriteClicked(){
+        favourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.e("TAG","favourite clicked");
             }
         });
     }

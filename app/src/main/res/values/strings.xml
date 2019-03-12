@@ -38,5 +38,6 @@
     <string name="preview">Preview</string>
     <string name="default_notification_channel_id">Auto Notifications</string>
     <string name="purchased">Purchased</string>
-    <string name="payment_failed">This payment was unsucessful</string>
+    <string name="payment_failed">This payment was unsuccessful</string>
+    <string name="prayer_heading">Prayer Heading</string>
 </resources>

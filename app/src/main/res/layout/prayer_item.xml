@@ -20,8 +20,9 @@
             android:fontFamily="@font/montserrat_bold"
             android:paddingLeft="8dp"
             android:paddingTop="8dp"
-            android:text="Prayer Heading"
-            android:textSize="24sp" />
+            android:text="@string/prayer_heading"
+            android:textSize="24sp"
+            />
 
         <View
             android:id="@+id/divider"
@@ -80,6 +81,14 @@
                 android:focusable="true"
                 android:text="$0.99"
                 android:textColor="#0000EE" />
+
+            <ImageView
+                android:id="@+id/prayer_favourited"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:visibility="gone"
+                app:srcCompat="@android:drawable/btn_star_big_on" />
 
         </LinearLayout>
 
