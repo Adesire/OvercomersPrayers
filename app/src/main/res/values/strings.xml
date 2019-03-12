@@ -34,4 +34,6 @@
     <string name="prayer_store">Prayer Store</string>
     <string name="my_prayers">My Prayers</string>
     <string name="info">Info</string>
+    <string name="scripture_references">Scripture references</string>
+    <string name="preview">Preview</string>
 </resources>

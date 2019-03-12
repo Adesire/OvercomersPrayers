@@ -75,9 +75,11 @@ public class PrayerPageFragment extends Fragment {
         Bundle b = getArguments();
 
         Prayer p = Parcels.unwrap(b.getParcelable("PRAYER_OBJECT"));
-
         String prayerHeadingString = p.getHeading().replace(". ", "");
         prayerHeadingString = prayerHeadingString.replace(".", "");
+        getActivityCast().setToolbarTitle(prayerHeadingString);
+
+        //().getSupportActionBar().
 
         String scripturesText = null;
         if(p.getScriptures()!= null){

@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     BottomNavigationView navigationView;
     @BindView(R.id.main_acivity_content)
     View mainView;
+    @BindView(R.id.toolbar_title)
+    TextView toolbarTitle;
     public static int CASE_DEFAULT = 192;
     public static int CASE_LOGIN_NORMAL = 195;
     public static final int CASE_LOGIN_THEN_PAY = 196;
@@ -122,9 +124,14 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         d = getResources().getDisplayMetrics().density;
         marginBottomInDp = (int) d * 56;
         params = (ConstraintLayout.LayoutParams) mainView.getLayoutParams();
-
+        //mToolbar.setTitle(getString(R.string.app_name));
+        fragmentManager.addOnBackStackChangedListener(this::toggleBottomNavVisibility);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     private void replaceFragmentContent(Fragment fragment, boolean shouldAddBackStack) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -133,6 +140,10 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
             fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
 
+    }
+
+    public void setToolbarTitle(String title) {
+        toolbarTitle.setText(title);
     }
 
     @Override
@@ -183,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         if (mUser == null) {
             isNavigationBarHidden = false;
         } else {
-            fragmentManager.addOnBackStackChangedListener(this::toggleBottomNavVisibility);
             isNavigationBarHidden = true;
         }
         toggleBottomNavVisibility();
@@ -191,16 +201,21 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
 
 
     private void toggleBottomNavVisibility() {
-        if (isNavigationBarHidden) {
-            navigationView.setVisibility(View.VISIBLE);
-            params.setMargins(0, 0, 0, marginBottomInDp);
-
-        } else {
-            navigationView.setVisibility(View.GONE);
-            params.setMargins(0, 0, 0, 0);
+        if (mUser != null) {
+            if (isNavigationBarHidden) {
+                navigationView.setVisibility(View.VISIBLE);
+                params.setMargins(0, 0, 0, marginBottomInDp);
+            } else {
+                navigationView.setVisibility(View.GONE);
+                params.setMargins(0, 0, 0, 0);
+            }
         }
-        isNavigationBarHidden = !isNavigationBarHidden;
+        if (fragmentManager.getBackStackEntryCount() < 1){
+            params.setMargins(0, 0, 0, 0);
+            setToolbarTitle(getString(R.string.app_name));
+        }
         mainView.setLayoutParams(params);
+
     }
 
     @Override
