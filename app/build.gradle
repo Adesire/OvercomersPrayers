@@ -36,6 +36,9 @@ android {
 }
 
 
+configurations {
+    all*.exclude group: 'com.google.guava', module: 'listenablefuture'
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -62,5 +65,8 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
     implementation 'com.evernote:android-state:1.4.1'
     annotationProcessor 'com.evernote:android-state-processor:1.4.1'
+    implementation 'com.google.firebase:firebase-messaging:17.4.0'
+
+
 
 }

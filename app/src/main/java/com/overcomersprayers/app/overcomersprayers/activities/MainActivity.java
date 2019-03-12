@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.evernote.android.state.State;
 import com.flutterwave.raveandroid.RaveConstants;
 import com.flutterwave.raveandroid.RavePayActivity;
 import com.flutterwave.raveandroid.RavePayManager;
@@ -39,6 +41,7 @@ import com.overcomersprayers.app.overcomersprayers.PaymentPresenter;
 import com.overcomersprayers.app.overcomersprayers.R;
 import com.overcomersprayers.app.overcomersprayers.fragments.PrayerListFragment;
 import com.overcomersprayers.app.overcomersprayers.fragments.PrayerPageFragment;
+import com.overcomersprayers.app.overcomersprayers.fragments.PrayerStoreFragment;
 import com.overcomersprayers.app.overcomersprayers.fragments.TransactionsFragment;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
 import com.overcomersprayers.app.overcomersprayers.models.Transactions;
@@ -48,6 +51,7 @@ import org.parceler.Parcels;
 public class MainActivity extends AppCompatActivity implements Listerners.PrayerListener, Listerners.PaymentListener {
     public static final int LOGIN_REQUEST_CODE = 1099;
     public static final String CASE = "case";
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     FirebaseUser mUser;
     Prayer currentPrayerSelected;
     Transactions transactions;
@@ -69,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     public static final String FRAGMENT_HOME = "home";
     public static final String FRAGMENT_TRANSACTION = "transaction";
     public static final String FRAGMENT_PRAYER_STORE = "prayer_store";
-    public static String CURRENT_FRAGMENT = FRAGMENT_HOME;
+    @State
+    public String CURRENT_FRAGMENT = "";
     FragmentManager fragmentManager = getSupportFragmentManager();
     boolean isNavigationBarHidden;
     float d;
@@ -80,6 +85,12 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
+        if (mUser == null && item.getItemId() != R.id.navigation_dashboard) {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.putExtra(CASE, item.getItemId());
+            startActivityForResult(intent, LOGIN_REQUEST_CODE);
+            return false;
+        }
         switch (item.getItemId()) {
             case R.id.navigation_home:
                 if (CURRENT_FRAGMENT.equals(FRAGMENT_HOME))
@@ -94,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                     return false;
                 else {
                     CURRENT_FRAGMENT = FRAGMENT_PRAYER_STORE;
-                    //replaceFragmentContent(HistoryFragment.NewInstance(u), false);
+                    replaceFragmentContent(PrayerStoreFragment.NewInstance(), false);
                     return true;
                 }
             case R.id.navigation_notifications:
@@ -117,14 +128,18 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         ButterKnife.bind(this);
         //FirebaseAuth.getInstance().signOut();
         navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        replaceFragmentContent(PrayerListFragment.NewInstance(), false);
         setSupportActionBar(mToolbar);
         progressDialog = new ProgressDialog(this);
         d = getResources().getDisplayMetrics().density;
         marginBottomInDp = (int) d * 56;
         params = (ConstraintLayout.LayoutParams) mainView.getLayoutParams();
         //mToolbar.setTitle(getString(R.string.app_name));
-        fragmentManager.addOnBackStackChangedListener(this::toggleBottomNavVisibility);
+        setToolbarTitle(getString(R.string.app_name));
+        fragmentManager.addOnBackStackChangedListener(() -> {
+            if (fragmentManager.getBackStackEntryCount() < 1)
+                setToolbarTitle(getString(R.string.app_name));
+            toggleBottomNavVisibility();
+        });
     }
 
     @Override
@@ -191,30 +206,26 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         super.onStart();
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser == null) {
-            isNavigationBarHidden = false;
+            Log.e(LOG_TAG, "user is null");
+            navigationView.findViewById(R.id.navigation_dashboard).performClick();
         } else {
-            isNavigationBarHidden = true;
+            if (TextUtils.isEmpty(CURRENT_FRAGMENT)) {
+                Log.e(LOG_TAG, "onstart: replacing here");
+                navigationView.findViewById(R.id.navigation_home).performClick();
+            }
         }
-        toggleBottomNavVisibility();
     }
 
 
     private void toggleBottomNavVisibility() {
-        if (mUser != null) {
-            if (isNavigationBarHidden) {
-                navigationView.setVisibility(View.VISIBLE);
-                params.setMargins(0, 0, 0, marginBottomInDp);
-            } else {
-                navigationView.setVisibility(View.GONE);
-                params.setMargins(0, 0, 0, 0);
-            }
-        }
-        if (fragmentManager.getBackStackEntryCount() < 1){
+        if (navigationView.getVisibility() == View.VISIBLE) {
+            navigationView.setVisibility(View.GONE);
             params.setMargins(0, 0, 0, 0);
-            setToolbarTitle(getString(R.string.app_name));
+        } else {
+            navigationView.setVisibility(View.VISIBLE);
+            params.setMargins(0, 0, 0, marginBottomInDp);
         }
         mainView.setLayoutParams(params);
-
     }
 
     @Override
@@ -222,13 +233,19 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
+                mUser = FirebaseAuth.getInstance().getCurrentUser();
                 if (data != null) {
                     int a = data.getIntExtra(CASE, CASE_DEFAULT);
-                    switch (a) {
-                        case CASE_LOGIN_THEN_PAY:
-                            initializePayment();
-                            break;
-                    }
+                    if (a == CASE_LOGIN_THEN_PAY)
+                        initializePayment();
+                    else if (a == CASE_LOGIN_NORMAL) {
+                        Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
+                    } else
+                        try {
+                            navigationView.findViewById(a).performClick();
+                        } catch (Exception e) {
+                            Log.e(LOG_TAG, "A mighty exception " + e.getLocalizedMessage());
+                        }
                 }
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "You didn't login", Toast.LENGTH_SHORT).show();
@@ -293,6 +310,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     public void onPaymentError(String errorMessage) {
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+        if (progressDialog.isShowing())
+            progressDialog.dismiss();
         if (alertDialog != null) {
             gifImageView.setVisibility(View.GONE);
             paymentStatusTextView.setText(errorMessage);
@@ -300,10 +319,13 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
     @Override
-    public void onPaymentCompleted(boolean wasSuccessful) {
+    public void onPaymentCompleted(boolean wasSuccessful, String message) {
         if (wasSuccessful) {
             gifImageView.setImageResource(R.drawable.praise);
             paymentStatusTextView.setText(getString(R.string.payment_successful));
+        }else {
+            gifImageView.setVisibility(View.GONE);
+            paymentStatusTextView.setText(message);
         }
     }
 
@@ -325,7 +347,10 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
             @Override
             public boolean onQueryTextChange(String newText) {
                 //Log.e("TAAAAG1", newText);
-                PrayerListFragment.sSearchListener.onPrayerSearched(newText);
+                if (CURRENT_FRAGMENT.equals(FRAGMENT_PRAYER_STORE))
+                    PrayerStoreFragment.sSearchListener.onPrayerSearched(newText);
+                else if (CURRENT_FRAGMENT.equals(FRAGMENT_HOME))
+                    PrayerListFragment.sSearchListener.onPrayerSearched(newText);
                 return false;
             }
         });

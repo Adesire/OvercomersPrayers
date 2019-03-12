@@ -27,7 +27,7 @@ public interface Listerners {
 
         void onPaymentError(String errorMessage);
 
-        void onPaymentCompleted(boolean wasSuccessful);
+        void onPaymentCompleted(boolean wasSuccessful, String message);
     }
     interface TransactionsItemListener {
         void onTransactionItemClicked(Transactions transactions);

@@ -9,6 +9,13 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
@@ -30,11 +37,15 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
     Listerners.PrayerListener prayerListener;
     CustomFilter filter;
     boolean isPrayerStore;
+    private FirebaseUser mUser;
+    private DatabaseReference rootRef;
 
     public MainPageAdapter(Listerners.PrayerListener prayerListener, boolean isPrayerStore) {
         this.prayerList = new ArrayList<>();
         this.prayerListener = prayerListener;
         this.isPrayerStore = isPrayerStore;
+        this.mUser = FirebaseAuth.getInstance().getCurrentUser();
+        this.rootRef = FirebaseDatabase.getInstance().getReference();
     }
 
     @NonNull
@@ -48,8 +59,12 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
 
     @Override
     public void onBindViewHolder(@NonNull MainPageViewHolder holder, int position) {
-        Prayer prayer = prayerList.get(position);
-        holder.bind(prayer, position);
+        Prayer prayer;
+        if (isPrayerStore)
+            prayer = prayerList.get(position);
+        else
+            prayer = prayerList.get(getItemCount() - position - 1);
+        holder.bind(prayer);
     }
 
     @Override
@@ -81,6 +96,8 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
         TextView purchase;
         @BindView(R.id.prayer_card)
         CardView card;
+        @BindView(R.id.purchased)
+        TextView purchasedTextView;
 
 
         public MainPageViewHolder(@NonNull View itemView) {
@@ -88,28 +105,64 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
             ButterKnife.bind(this, itemView);
         }
 
-        void bind(Prayer prayer, int p) {
-            if (isPrayerStore){
-                if (p <= 2) {
-                    preview.setVisibility(View.GONE);
-                    purchase.setVisibility(View.GONE);
-                    card.setOnClickListener(v -> prayerListener.onCardClicked(prayer));
+        private void bind(Prayer prayer) {
+            if (isPrayerStore) {
+                if (prayer.getId().equals("-LZuCd9_DRH_FWurPmno") || prayer.getId().equals("-LZuCd9at4GXkUCAVAmf") || prayer.getId().equals("-LZuCd9bS47B0oLQqaNQ")) {
+                    setCardListener(prayer);
                 } else {
-                    preview.setVisibility(View.VISIBLE);
-                    purchase.setVisibility(View.VISIBLE);
-                    preview.setOnClickListener(v -> prayerListener.onPreviewClicked(prayer));
-                    purchase.setOnClickListener(v -> prayerListener.onPurchaseInitialized(prayer));
+                    checkUserAlreadyPurchased(prayer);
                 }
+            } else {
+                setCardListener(prayer);
             }
             String prayerHeadingString = prayer.getHeading().replace(". ", "");
             prayerHeadingString = prayerHeadingString.replace(".", "");
             prayerHeading.setText(prayerHeadingString);
-            if (prayer.getScriptures() != null && preview.getVisibility() == View.GONE && purchase.getVisibility() == View.GONE) {
-                scriptureReference.setText(prayer.getScriptures());
-            } else if (prayer.getScriptures() != null) {
-                String scriptureCut = prayer.getScriptures().substring(0, 20) + "....";
+            if (prayer.getScriptures() != null) {
+                String scriptureCut = isPrayerStore ? prayer.getScriptures().substring(0, 20) + "...." : prayer.getScriptures();
                 scriptureReference.setText(scriptureCut);
             }
+        }
+
+        private void checkUserAlreadyPurchased(Prayer prayer) {
+            if (mUser != null) {
+                FirebaseDatabase.getInstance().getReference().child("userprayer").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(prayer.getId()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            preview.setVisibility(View.GONE);
+                            purchase.setVisibility(View.GONE);
+                            purchasedTextView.setVisibility(View.VISIBLE);
+                            setCardListener(prayer);
+                        } else {
+                            unsetCardListener(prayer);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        unsetCardListener(prayer);
+                    }
+                });
+            } else {
+                unsetCardListener(prayer);
+            }
+        }
+
+        private void unsetCardListener(Prayer prayer) {
+            card.setOnClickListener(null);
+            preview.setVisibility(View.VISIBLE);
+            purchase.setVisibility(View.VISIBLE);
+            purchasedTextView.setVisibility(View.GONE);
+            preview.setOnClickListener(v -> prayerListener.onPreviewClicked(prayer));
+            purchase.setOnClickListener(v -> prayerListener.onPurchaseInitialized(prayer));
+        }
+
+        private void setCardListener(Prayer prayer) {
+            preview.setVisibility(View.GONE);
+            purchase.setVisibility(View.GONE);
+            card.setOnClickListener(v -> prayerListener.onCardClicked(prayer));
         }
 
     }

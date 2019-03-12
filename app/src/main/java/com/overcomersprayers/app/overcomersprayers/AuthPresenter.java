@@ -10,9 +10,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.overcomersprayers.app.overcomersprayers.models.Users;
 
 import androidx.annotation.NonNull;
+
 public class AuthPresenter {
     private Listerners.AuthListener mAuthListener;
     private FirebaseAuth mAuth;
@@ -32,6 +34,7 @@ public class AuthPresenter {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
+                            reference.child(Users.getTableName()).child(uid).child("deviceToken").setValue(FirebaseInstanceId.getInstance().getToken());
                             mAuthListener.onAuthSuccess();
                         } else {
                             mAuthListener.onAuthFailed("User not found");
@@ -56,8 +59,9 @@ public class AuthPresenter {
                 FirebaseUser firebaseUser = task.getResult().getUser();
                 UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(user.getFirstName().concat(":::").concat(user.getLastName())).build();
                 firebaseUser.updateProfile(profileChangeRequest).addOnCompleteListener(task12 -> {
-                    if (task12.isSuccessful()){
+                    if (task12.isSuccessful()) {
                         user.setId(firebaseUser.getUid());
+                        user.setDeviceToken(FirebaseInstanceId.getInstance().getToken());
                         reference.child(Users.getTableName()).child(firebaseUser.getUid()).setValue(user).addOnCompleteListener(task1 -> {
                             if (task1.isSuccessful()) {
                                 mAuthListener.onAuthSuccess();

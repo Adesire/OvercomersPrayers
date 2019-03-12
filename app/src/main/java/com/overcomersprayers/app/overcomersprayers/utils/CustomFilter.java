@@ -49,4 +49,8 @@ public class CustomFilter extends Filter {
         //REFRESH
         adapter.notifyDataSetChanged();
     }
+
+    public CustomFilter(boolean isSearching) {
+        super();
+    }
 }

@@ -7,8 +7,11 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
 import com.overcomersprayers.app.overcomersprayers.models.RaveResponse;
 import com.overcomersprayers.app.overcomersprayers.models.Transactions;
@@ -19,6 +22,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -53,6 +57,24 @@ public class PaymentPresenter {
     }
 
     public void initializePayment() {
+        reference.child("userprayer").child(user.getUid()).child(selectedPrayer.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists())
+                    paymentListener.onPaymentError("You have already purchased this prayer");
+                else {
+                    startPayment();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                paymentListener.onPaymentError(databaseError.getMessage());
+            }
+        });
+    }
+
+    private void startPayment() {
         DatabaseReference userTransactionRef = reference.child("transactions").child(user.getUid());
         String key = userTransactionRef.push().getKey();
         transactions.setTrxRef(key);
@@ -74,7 +96,7 @@ public class PaymentPresenter {
 
     public void verifyPayment() {
         if (transactions.isHasBeenUpdated())
-            paymentListener.onPaymentCompleted(transactions.isWasSuccesful());
+            paymentListener.onPaymentCompleted(transactions.isWasSuccesful(), null);
         else {
             JSONObject jsonObject;
             jsonObject = new JSONObject();
@@ -95,11 +117,11 @@ public class PaymentPresenter {
                         if (raveResponse.getStatus().equals("successful")) {
                             addPrayerToUserPrayer();
                         } else {
-                            endTransaction(false);
+                            endTransaction(false, mContext.getString(R.string.payment_failed));
                         }
                     } else {
                         Log.e(LOG_TAG, "rave response is empty for transaction: " + transactions.getTrxRef());
-                        paymentListener.onPaymentError(mContext.getString(R.string.payment_status_error));
+                        endTransaction(false, mContext.getString(R.string.payment_failed));
                     }
                 }
 
@@ -115,16 +137,16 @@ public class PaymentPresenter {
         Toast.makeText(mContext, "adding prayer to user", Toast.LENGTH_SHORT).show();
         Map<String, Object> map = new HashMap<>();
         map.put("prayerId", transactions.getPrayerId());
-        reference.child("userprayer").child(user.getUid()).child(transactions.getPrayerId()).updateChildren(selectedPrayer.toMap()).addOnCompleteListener(task -> endTransaction(true));
+        reference.child("userprayer").child(user.getUid()).child(transactions.getPrayerId()).updateChildren(selectedPrayer.toMap()).addOnCompleteListener(task -> endTransaction(true, null));
     }
 
-    public void endTransaction(boolean wasSuccessful) {
+    public void endTransaction(boolean wasSuccessful, String message) {
         transactions.setWasSuccesful(wasSuccessful);
         transactions.setHasBeenUpdated(true);
         transactions.setStatus(wasSuccessful ? "Successful" : "Unsuccessful");
         reference.child(Transactions.getTableName()).child(user.getUid()).child(transactions.getTrxRef()).updateChildren(transactions.toMap()).addOnCompleteListener(task -> {
             if (task.isSuccessful())
-                paymentListener.onPaymentCompleted(wasSuccessful);
+                paymentListener.onPaymentCompleted(wasSuccessful, message);
         });
     }
 

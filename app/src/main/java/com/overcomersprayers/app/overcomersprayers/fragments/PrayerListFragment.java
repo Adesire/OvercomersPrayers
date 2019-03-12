@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,6 +43,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     Listerners.PrayerListener prayerListener;
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
     public static Listerners.SearchListener sSearchListener;
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     public static PrayerListFragment NewInstance() {
         return new PrayerListFragment();
@@ -61,7 +64,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     }
 
     private void getPrayers() {
-        rootRef.child("prayer").addValueEventListener(new ValueEventListener() {
+        rootRef.child("userprayer").child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Prayer> prayers = new ArrayList<>();
@@ -101,7 +104,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
 
     @Override
     public void onPrayerSearched(String query) {
-        Log.e("TAAAAG1", query);
+        //Log.e("TAAAAG1", query);
         mainPageAdapter.getFilter().filter(query);
     }
 }

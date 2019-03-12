@@ -41,8 +41,8 @@ public class PrayerStoreFragment extends Fragment implements Listerners.SearchLi
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
     public static Listerners.SearchListener sSearchListener;
 
-    public static PrayerListFragment NewInstance() {
-        return new PrayerListFragment();
+    public static PrayerStoreFragment NewInstance() {
+        return new PrayerStoreFragment();
     }
 
     @Override
@@ -100,6 +100,6 @@ public class PrayerStoreFragment extends Fragment implements Listerners.SearchLi
 
     @Override
     public void onPrayerSearched(String query) {
-        Log.e("TAAAAG1", query);
+        mainPageAdapter.getFilter().filter(query);
     }
 }

@@ -10,6 +10,7 @@ public class Users {
     private String firstName;
     private String lastName;
     private String phone;
+    private String deviceToken;
 
     public Users() {
     }
@@ -43,7 +44,6 @@ public class Users {
         this.email = email;
     }
 
-
     public String getFirstName() {
         return firstName;
     }
@@ -58,6 +58,22 @@ public class Users {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
     }
 }
 

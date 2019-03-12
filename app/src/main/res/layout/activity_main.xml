@@ -27,7 +27,6 @@
     </FrameLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:visibility="gone"
         android:id="@+id/navigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -40,10 +39,11 @@
         app:menu="@menu/navigation" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/favourite_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="44dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
         android:src="@android:drawable/btn_star"
         app:layout_constraintBottom_toBottomOf="@+id/main_acivity_content"
         app:layout_constraintEnd_toEndOf="parent" />
