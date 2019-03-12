@@ -50,7 +50,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         prayerHeadingList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mainPageAdapter = new MainPageAdapter(prayerListener);
+        mainPageAdapter = new MainPageAdapter(prayerListener, false);
         prayerHeadingList.setAdapter(mainPageAdapter);
         refreshLayout.setOnRefreshListener(this::getPrayers);
         refreshLayout.setRefreshing(true);
@@ -102,5 +102,6 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     @Override
     public void onPrayerSearched(String query) {
         Log.e("TAAAAG1", query);
+        mainPageAdapter.getFilter().filter(query);
     }
 }

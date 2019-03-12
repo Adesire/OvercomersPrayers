@@ -5,11 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
+import com.overcomersprayers.app.overcomersprayers.utils.CustomFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +23,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPageViewHolder> {
+public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPageViewHolder> implements Filterable {
 
     private static final String LOG_TAG = MainPageAdapter.class.getSimpleName();
-    List<Prayer> prayerList;
+    public List<Prayer> prayerList;
     Listerners.PrayerListener prayerListener;
+    CustomFilter filter;
+    boolean isPrayerStore;
 
-    public MainPageAdapter(Listerners.PrayerListener prayerListener) {
+    public MainPageAdapter(Listerners.PrayerListener prayerListener, boolean isPrayerStore) {
         this.prayerList = new ArrayList<>();
         this.prayerListener = prayerListener;
+        this.isPrayerStore = isPrayerStore;
     }
 
     @NonNull
@@ -56,6 +62,14 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
         notifyDataSetChanged();
     }
 
+    @Override
+    public Filter getFilter() {
+        if (filter == null) {
+            filter = new CustomFilter(prayerList, this);
+        }
+        return filter;
+    }
+
     class MainPageViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.prayer_heading)
         TextView prayerHeading;
@@ -75,23 +89,25 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
         }
 
         void bind(Prayer prayer, int p) {
-            if (p <= 2) {
-                preview.setVisibility(View.GONE);
-                purchase.setVisibility(View.GONE);
-                card.setOnClickListener(v -> prayerListener.onCardClicked(prayer));
-            } else {
-                preview.setVisibility(View.VISIBLE);
-                purchase.setVisibility(View.VISIBLE);
-                preview.setOnClickListener(v -> prayerListener.onPreviewClicked(prayer));
-                purchase.setOnClickListener(v -> prayerListener.onPurchaseInitialized(prayer));
+            if (isPrayerStore){
+                if (p <= 2) {
+                    preview.setVisibility(View.GONE);
+                    purchase.setVisibility(View.GONE);
+                    card.setOnClickListener(v -> prayerListener.onCardClicked(prayer));
+                } else {
+                    preview.setVisibility(View.VISIBLE);
+                    purchase.setVisibility(View.VISIBLE);
+                    preview.setOnClickListener(v -> prayerListener.onPreviewClicked(prayer));
+                    purchase.setOnClickListener(v -> prayerListener.onPurchaseInitialized(prayer));
+                }
             }
             String prayerHeadingString = prayer.getHeading().replace(". ", "");
             prayerHeadingString = prayerHeadingString.replace(".", "");
             prayerHeading.setText(prayerHeadingString);
             if (prayer.getScriptures() != null && preview.getVisibility() == View.GONE && purchase.getVisibility() == View.GONE) {
                 scriptureReference.setText(prayer.getScriptures());
-            }else if(prayer.getScriptures() != null){
-                String scriptureCut = prayer.getScriptures().substring(0,20)+"....";
+            } else if (prayer.getScriptures() != null) {
+                String scriptureCut = prayer.getScriptures().substring(0, 20) + "....";
                 scriptureReference.setText(scriptureCut);
             }
         }

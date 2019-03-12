@@ -68,9 +68,7 @@ public class PrayerPageAdapter extends RecyclerView.Adapter<PrayerPageAdapter.Pr
             serialNumber.setText(String.valueOf(position + 1));
             if(a){
                 if (position > 2) {
-                    if (Build.VERSION.SDK_INT >= 11) {
-                        prayerPointTextview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-                    }
+                    prayerPointTextview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
                     float radius = prayerPointTextview.getTextSize() / 3;
                     BlurMaskFilter filter = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);
                     prayerPointTextview.getPaint().setMaskFilter(filter);
