@@ -12,7 +12,7 @@
     <item
         android:id="@+id/sign_button"
         android:title="@string/action_sign_in"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:orderInCategory="20"
         android:background="?attr/selectableItemBackground"
         android:fontFamily="@font/montserrat"
