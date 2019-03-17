@@ -1,10 +1,14 @@
 package com.overcomersprayers.app.overcomersprayers.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.RelativeLayout;
 
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
@@ -23,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.codetail.animation.ViewAnimationUtils;
 
 public class PrayerFavouriteFragment extends Fragment {
 
@@ -30,6 +35,7 @@ public class PrayerFavouriteFragment extends Fragment {
     RecyclerView prayerFavouriteList;
     MainPageAdapter mainPageAdapter;
     Listerners.PrayerListener prayerListener;
+
 
     public static PrayerFavouriteFragment NewInstance() {
         return new PrayerFavouriteFragment();
@@ -55,5 +61,29 @@ public class PrayerFavouriteFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         prayerListener = (Listerners.PrayerListener) context;
+    }
+
+    private void revealFavourites(View view){
+
+        RecyclerView infoContainer = prayerFavouriteList;
+
+        int cx = (view.getLeft() + view.getRight()) / 2;
+        int cy = (view.getTop() + view.getBottom()) / 2;
+        float radius = Math.max(infoContainer.getWidth(), infoContainer.getHeight()) * 2.0f;
+
+        if (infoContainer.getVisibility() == View.INVISIBLE) {
+            infoContainer.setVisibility(View.VISIBLE);
+            ViewAnimationUtils.createCircularReveal(infoContainer, cx, cy, 0, radius).start();
+        } else {
+            Animator reveal = ViewAnimationUtils.createCircularReveal(
+                    infoContainer, cx, cy, radius, 0);
+            reveal.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    infoContainer.setVisibility(View.INVISIBLE);
+                }
+            });
+            reveal.start();
+        }
     }
 }

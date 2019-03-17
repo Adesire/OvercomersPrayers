@@ -1,6 +1,8 @@
+/*
 package com.overcomersprayers.app.overcomersprayers.utils;
 
 import android.animation.Animator;
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -12,7 +14,6 @@ import android.view.ViewAnimationUtils;
 import com.google.auto.value.AutoValue;
 
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-import androidx.vectordrawable.graphics.drawable.ArgbEvaluator;
 
 public class AnimationUtils {
     public static void registerCircularRevealAnimation(final Context context, final View view, final RevealAnimationSetting revealSettings, final int startColor, final int endColor) {
@@ -67,3 +68,4 @@ public abstract class RevealAnimationSetting implements Parcelable {
         return new AutoValue_RevealAnimationSetting(centerX, centerY, width, height);
     }
 }
+*/

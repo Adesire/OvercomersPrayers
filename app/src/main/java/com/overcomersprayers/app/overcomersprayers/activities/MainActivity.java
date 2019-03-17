@@ -8,14 +8,19 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.droidsonroids.gif.GifImageView;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,6 +29,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.view.ViewAnimationUtils;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     Toolbar mToolbar;
     @BindView(R.id.fab)
     FloatingActionButton fab;
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -377,6 +385,82 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
 
     private void onFabClicked() {
         replaceFragmentContent(PrayerFavouriteFragment.NewInstance(), true);
+        circularReveal();
     }
 
+    private void revealShow(View dialogView, boolean b, final Dialog dialog) {
+
+        final View view = dialogView.findViewById(R.id.prayerFavouriteList);
+
+        int w = view.getWidth();
+        int h = view.getHeight();
+
+        int endRadius = (int) Math.hypot(w, h);
+
+        int cx = (int) (fab.getX() + (fab.getWidth()/2));
+        int cy = (int) (fab.getY())+ fab.getHeight() + 56;
+
+
+        if(b){
+            Animator revealAnimator = ViewAnimationUtils.createCircularReveal(view, cx,cy, 0, endRadius);
+
+            view.setVisibility(View.VISIBLE);
+            revealAnimator.setDuration(700);
+            revealAnimator.start();
+
+        } else {
+
+            Animator anim =
+                    ViewAnimationUtils.createCircularReveal(view, cx, cy, endRadius, 0);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    dialog.dismiss();
+                    view.setVisibility(View.INVISIBLE);
+
+                }
+            });
+            anim.setDuration(700);
+            anim.start();
+        }
+
+    }
+
+    private void circularReveal(){
+        // previously invisible view
+        View myView = findViewById(R.id.main_acivity_content);
+
+// Check if the runtime version is at least Lollipop
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // get the center for the clipping circle
+            int cx = (fab.getLeft() + fab.getRight()) / 2;
+            int cy = (fab.getTop() + fab.getBottom()) / 2;
+
+            int width = myView.getWidth();
+            int height = myView.getHeight();
+
+            // get the final radius for the clipping circle
+            float finalRadius = (float) Math.hypot(width, height);
+
+            // create the animator for this view (the start radius is zero)
+            Animator anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0f, finalRadius);
+
+            // make the view visible and start the animation
+            myView.setVisibility(View.VISIBLE);
+            anim.setDuration(200);
+            anim.start();
+        } else {
+            // set the view to visible without a circular reveal animation below Lollipop
+            myView.setVisibility(View.VISIBLE);
+        }
+        fab.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        fab.setVisibility(View.VISIBLE  );
+    }
 }
