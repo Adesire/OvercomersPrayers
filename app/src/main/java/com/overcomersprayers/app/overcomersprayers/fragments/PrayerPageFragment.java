@@ -118,9 +118,15 @@ public class PrayerPageFragment extends Fragment {
         toolbarTitle.setText(prayerHeadingString);
         toolbarTitle.setSelected(true);
         getPrayerPoints(p);
-        getIsFavourite();
 
-        onFavouriteClicked();
+        favourite.setVisibility(View.GONE);
+
+        if(user != null){
+            getIsFavourite();
+            onFavouriteClicked();
+            favourite.setVisibility(View.VISIBLE);
+        }
+
     }
 
     private void getIsFavourite() {

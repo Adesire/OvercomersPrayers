@@ -182,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
     public void setToolbarTitle(String title) {
+        toolbarTitle.setSelected(true);
         toolbarTitle.setText(title);
     }
 
@@ -434,51 +435,6 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         circularReveal();
     }
 
-    private void revealShow(View dialogView, boolean b, final Dialog dialog) {
-
-        final View view = dialogView.findViewById(R.id.prayerFavouriteList);
-
-        int w = view.getWidth();
-        int h = view.getHeight();
-
-        int endRadius = (int) Math.hypot(w, h);
-
-        int cx = (int) (fab.getX() + (fab.getWidth() / 2));
-        int cy = (int) (fab.getY()) + fab.getHeight() + 56;
-
-
-        if (b) {
-            Animator revealAnimator = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                revealAnimator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, endRadius);
-            }
-
-            view.setVisibility(View.VISIBLE);
-            revealAnimator.setDuration(700);
-            revealAnimator.start();
-
-        } else {
-
-            Animator anim =
-                    null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, endRadius, 0);
-            }
-
-            anim.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    dialog.dismiss();
-                    view.setVisibility(View.INVISIBLE);
-
-                }
-            });
-            anim.setDuration(700);
-            anim.start();
-        }
-
-    }
 
     private void circularReveal() {
         // previously invisible view
@@ -513,6 +469,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        fab.setVisibility(View.VISIBLE);
+        if(mUser != null)
+            fab.setVisibility(View.VISIBLE);
     }
 }
