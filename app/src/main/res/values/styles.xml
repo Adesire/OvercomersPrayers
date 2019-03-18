@@ -9,6 +9,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.TransparentBG" parent="AppTheme">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
     <style name="ToolbarTheme" parent="ThemeOverlay.MaterialComponents.Light">
         <item name="android:fontFamily">@font/montserrat</item>
         <item name="android:textSize">13sp</item>

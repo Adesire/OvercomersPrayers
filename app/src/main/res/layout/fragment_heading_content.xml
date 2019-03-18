@@ -6,8 +6,7 @@
     android:orientation="vertical">
 
 
-    <include
-        layout="@layout/app_toolbar"/>
+    <include layout="@layout/app_toolbar" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -39,13 +38,13 @@
                     android:id="@+id/favourite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:paddingBottom="4dp"
                     android:layout_gravity="bottom"
+                    android:layout_marginStart="16dp"
                     android:clickable="true"
                     android:drawableStart="@drawable/fav_toggle"
-                    app:srcCompat="@android:drawable/btn_star_big_off"
-                    android:focusable="true" />
+                    android:focusable="true"
+                    android:paddingBottom="4dp"
+                    app:srcCompat="@android:drawable/btn_star_big_off" />
 
             </LinearLayout>
 

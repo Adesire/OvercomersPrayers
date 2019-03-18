@@ -1,5 +1,6 @@
 package com.overcomersprayers.app.overcomersprayers.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -15,6 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
 import com.overcomersprayers.app.overcomersprayers.activities.MainActivity;
 import com.overcomersprayers.app.overcomersprayers.activities.PrayerHeadingActivity;
@@ -33,6 +35,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class PrayerPageFragment extends Fragment {
 
@@ -47,13 +50,15 @@ public class PrayerPageFragment extends Fragment {
     @BindView(R.id.favourite)
     ImageView favourite;
     PrayerPageAdapter mPrayerPageAdapter;
+    Listerners.PrayerListener prayerListener;
     List<Prayer> favouritedPrayers = new ArrayList<>();
     private DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+    Prayer p;
 
 
     public static int X;
 
-    public static PrayerPageFragment newInstance(Prayer prayer){
+    public static PrayerPageFragment newInstance(Prayer prayer) {
         PrayerPageFragment fragment = new PrayerPageFragment();
         Bundle b = new Bundle();
         b.putParcelable("PRAYER_OBJECT", Parcels.wrap(prayer));
@@ -69,7 +74,9 @@ public class PrayerPageFragment extends Fragment {
         return view;
     }
 
-    public MainActivity getActivityCast(){return (MainActivity)getActivity();}
+    public MainActivity getActivityCast() {
+        return (MainActivity) getActivity();
+    }
 
 
     @Override
@@ -77,23 +84,23 @@ public class PrayerPageFragment extends Fragment {
         Bundle bool = new Bundle();
         Bundle b = getArguments();
 
-        Prayer p = Parcels.unwrap(b.getParcelable("PRAYER_OBJECT"));
+        p = Parcels.unwrap(b.getParcelable("PRAYER_OBJECT"));
         String prayerHeadingString = p.getHeading().replace(". ", "");
         prayerHeadingString = prayerHeadingString.replace(".", "");
         getActivityCast().setToolbarTitle(prayerHeadingString);
 
 
         String scripturesText = null;
-        if(p.getScriptures()!= null){
-            scripturesText =  p.getScriptures().substring(0,20)+"...";
-        }else{
-            scripturesText =  "No Scripture reference";
+        if (p.getScriptures() != null) {
+            scripturesText = p.getScriptures().substring(0, 20) + "...";
+        } else {
+            scripturesText = "No Scripture reference";
         }
-        if(X == 0){
+        if (X == 0) {
             scriptures.setText(scripturesText);
-            bool.putBoolean("IS_LOCKED",true);
+            bool.putBoolean("IS_LOCKED", true);
 
-        }else{
+        } else {
             scriptures.setText(p.getScriptures());
             viewMore.setVisibility(View.GONE);
         }
@@ -105,6 +112,11 @@ public class PrayerPageFragment extends Fragment {
         getPrayerPoints(p);
 
         onFavouriteClicked();
+    }
+
+    @OnClick(R.id.view_more)
+    public void initPayment() {
+        prayerListener.onPurchaseInitialized(p);
     }
 
     private void getPrayerPoints(Prayer p) {
@@ -128,12 +140,13 @@ public class PrayerPageFragment extends Fragment {
         });
     }
 
-    private void onFavouriteClicked(){
-        favourite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.e("TAG","favourite clicked");
-            }
-        });
+    private void onFavouriteClicked() {
+        favourite.setOnClickListener(view -> Log.e("TAG", "favourite clicked"));
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        prayerListener = (Listerners.PrayerListener) context;
     }
 }

@@ -1,6 +1,7 @@
+/*
 package com.overcomersprayers.app.overcomersprayers.utils;
-
 /**import android.animation.Animator;
+import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
@@ -13,6 +14,7 @@ import android.view.ViewAnimationUtils;
 import com.google.auto.value.AutoValue;
 
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+
 
 
 public class AnimationUtils {

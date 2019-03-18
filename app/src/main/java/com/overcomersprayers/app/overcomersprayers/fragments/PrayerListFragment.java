@@ -17,6 +17,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
@@ -40,7 +41,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
 
     private static final String LOG_TAG = PrayerListFragment.class.getSimpleName();
     private static final String MOTION_X_ARG = null;
-    private static final String MOTION_Y_ARG = null ;
+    private static final String MOTION_Y_ARG = null;
     @BindView(R.id.prayerHeadingList)
     RecyclerView prayerHeadingList;
     @BindView(R.id.swipe_refresh)
@@ -50,6 +51,8 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
     public static Listerners.SearchListener sSearchListener;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    Query query;
+    String lastKey;
 
     public static PrayerListFragment NewInstance() {
         return new PrayerListFragment();
@@ -59,14 +62,20 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         prayerHeadingList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mainPageAdapter = new MainPageAdapter(prayerListener, false);
+        if (mainPageAdapter == null) {
+            mainPageAdapter = new MainPageAdapter(prayerListener, false);
+        }
         prayerHeadingList.setAdapter(mainPageAdapter);
         refreshLayout.setOnRefreshListener(this::getPrayers);
         refreshLayout.setRefreshing(true);
+        getLastKey();
         getPrayers();
 //      prayerHeadingList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
 
+    }
+
+    private void getLastKey() {
     }
 
     private void getPrayers() {

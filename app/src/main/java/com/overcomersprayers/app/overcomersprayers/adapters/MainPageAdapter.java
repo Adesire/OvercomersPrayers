@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,7 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPageViewHolder> implements Filterable {
+public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseViewHolder> implements Filterable {
 
     private static final String LOG_TAG = MainPageAdapter.class.getSimpleName();
     public List<Prayer> prayerList;
@@ -39,6 +40,9 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
     boolean isPrayerStore;
     private FirebaseUser mUser;
     private DatabaseReference rootRef;
+    private final int VIEW_TYPE_PRAYER = 109;
+    private final int VIEW_TYPE_LOADING = 199;
+    private boolean loaderVisible = false;
 
     public MainPageAdapter(Listerners.PrayerListener prayerListener, boolean isPrayerStore) {
         this.prayerList = new ArrayList<>();
@@ -50,26 +54,76 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
 
     @NonNull
     @Override
-    public MainPageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.prayer_item, parent, false);
-        return new MainPageViewHolder(view);
+    public BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view;
+        switch (viewType) {
+            case VIEW_TYPE_LOADING:
+                return new FooterHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.prayer_item_loading, parent, false));
+            case VIEW_TYPE_PRAYER:
 
+            default:
+                return new MainPageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.prayer_item, parent, false));
+        }
 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MainPageViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
         Prayer prayer;
         if (isPrayerStore)
             prayer = prayerList.get(position);
         else
             prayer = prayerList.get(getItemCount() - position - 1);
-        holder.bind(prayer);
+        if (!prayer.isLoader())
+            holder.bind(prayer);
+    }
+
+    public void showLoader() {
+        loaderVisible = true;
+        prayerList.add(new Prayer(true));
+        notifyItemInserted(prayerList.size() - 1);
+    }
+
+    public void removeLoader() {
+        loaderVisible = false;
+        if (prayerList.size() < 1)
+            return;
+        int position = prayerList.size() - 1;
+        Prayer item = prayerList.get(position);
+        if (item != null) {
+            prayerList.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Prayer prayer = prayerList.get(position);
+        if (prayer.isLoader())
+            return VIEW_TYPE_LOADING;
+        else
+            return VIEW_TYPE_PRAYER;
     }
 
     @Override
     public int getItemCount() {
         return prayerList.size();
+    }
+
+    public void clear() {
+        prayerList = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
+    public void addAll(List<Prayer> prayers) {
+        int initialSize = prayerList.size();
+        prayerList.addAll(prayers);
+        notifyItemRangeInserted(initialSize, prayers.size());
+
+    }
+
+    public String getLastItemId() {
+        return prayerList.get(prayerList.size() - 1).getId();
     }
 
     public void swapData(List<Prayer> prayers) {
@@ -85,7 +139,7 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
         return filter;
     }
 
-    class MainPageViewHolder extends RecyclerView.ViewHolder {
+    class MainPageViewHolder extends BaseViewHolder {
         @BindView(R.id.prayer_heading)
         TextView prayerHeading;
         @BindView(R.id.scripture_reference)
@@ -105,7 +159,8 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
             ButterKnife.bind(this, itemView);
         }
 
-        private void bind(Prayer prayer) {
+        public void bind(Prayer prayer) {
+            super.bind(prayer);
             if (isPrayerStore) {
                 if (prayer.getId().equals("-LZuCd9_DRH_FWurPmno") || prayer.getId().equals("-LZuCd9at4GXkUCAVAmf") || prayer.getId().equals("-LZuCd9bS47B0oLQqaNQ")) {
                     setCardListener(prayer);
@@ -164,6 +219,31 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.MainPa
             purchase.setVisibility(View.GONE);
             card.setOnClickListener(v -> prayerListener.onCardClicked(prayer));
         }
+
+    }
+
+    abstract class BaseViewHolder extends RecyclerView.ViewHolder {
+
+        public BaseViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
+
+        public void bind(Prayer prayer) {
+
+        }
+
+    }
+
+    public class FooterHolder extends BaseViewHolder {
+        @BindView(R.id.progressBar)
+        ProgressBar mProgressBar;
+
+
+        FooterHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
 
     }
 

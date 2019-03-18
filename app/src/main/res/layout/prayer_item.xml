@@ -17,12 +17,12 @@
             android:id="@+id/prayer_heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_bold"
+            android:fontFamily="@font/cherry_cream_soda"
             android:paddingLeft="8dp"
             android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:text="@string/prayer_heading"
-            android:textSize="24sp"
-            />
+            android:textSize="18sp" />
 
         <View
             android:id="@+id/divider"

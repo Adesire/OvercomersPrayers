@@ -12,8 +12,21 @@ public class Prayer {
     private String scriptures;
     private String prayerPointsPreview;
     private String prayerPoints;
+    private boolean isLoader = false;
 
     public Prayer() {
+    }
+
+    public Prayer(boolean b) {
+        this.isLoader = b;
+    }
+
+    public boolean isLoader() {
+        return isLoader;
+    }
+
+    public void setLoader(boolean loader) {
+        isLoader = loader;
     }
 
     public String getId() {

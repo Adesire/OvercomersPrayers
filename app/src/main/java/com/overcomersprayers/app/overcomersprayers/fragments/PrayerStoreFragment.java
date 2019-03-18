@@ -2,15 +2,19 @@ package com.overcomersprayers.app.overcomersprayers.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.evernote.android.state.State;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
@@ -23,6 +27,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -40,6 +45,10 @@ public class PrayerStoreFragment extends Fragment implements Listerners.SearchLi
     Listerners.PrayerListener prayerListener;
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
     public static Listerners.SearchListener sSearchListener;
+    private String lastKey = "", lastNode = "";
+    final int ITEM_LOAD_COUNT = 10;
+    int totalItem = 0, lastVisibleItem;
+    private boolean isMaxData, isLoading = false;
 
     public static PrayerStoreFragment NewInstance() {
         return new PrayerStoreFragment();
@@ -48,38 +57,96 @@ public class PrayerStoreFragment extends Fragment implements Listerners.SearchLi
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        prayerHeadingList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mainPageAdapter = new MainPageAdapter(prayerListener, true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        prayerHeadingList.setLayoutManager(layoutManager);
+        if (mainPageAdapter == null) {
+            mainPageAdapter = new MainPageAdapter(prayerListener, true);
+        }
         prayerHeadingList.setAdapter(mainPageAdapter);
-        refreshLayout.setOnRefreshListener(this::getPrayers);
-        refreshLayout.setRefreshing(true);
-        getPrayers();
-//      prayerHeadingList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        refreshLayout.setOnRefreshListener(() -> {
+            isMaxData = false;
+            lastNode = "";
+            mainPageAdapter = new MainPageAdapter(prayerListener, true);
+            getPrayers();
+        });
+        getLastKey();
+        prayerHeadingList.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (!recyclerView.canScrollVertically(1)) {
+                    if (!isMaxData && !isLoading) {
+                        getPrayers();
+                        isLoading = true;
+                    }
+                }
+            }
+        });
+        prayerHeadingList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
 
     }
 
-    private void getPrayers() {
-        rootRef.child("prayer").addValueEventListener(new ValueEventListener() {
+    private void getLastKey() {
+        rootRef.child("prayer").orderByKey().limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<Prayer> prayers = new ArrayList<>();
-                if (dataSnapshot.getChildrenCount() > 0) {
-                    for (DataSnapshot prayerSnapshot : dataSnapshot.getChildren()) {
-                        Prayer prayer = prayerSnapshot.getValue(Prayer.class);
-                        prayer.setId(prayerSnapshot.getKey());
-                        prayers.add(prayer);
-                    }
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    lastKey = snapshot.getKey();
+                    getPrayers();
                 }
-                refreshLayout.setRefreshing(false);
-                mainPageAdapter.swapData(prayers);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                refreshLayout.setRefreshing(false);
+                isLoading = false;
             }
         });
+    }
+
+    private void getPrayers() {
+        if (!isMaxData) {
+            Query query;
+            if (TextUtils.isEmpty(lastNode)) {
+                query = rootRef.child("prayer").orderByKey().limitToFirst(ITEM_LOAD_COUNT);
+                refreshLayout.setRefreshing(true);
+            } else {
+                query = rootRef.child("prayer").orderByKey().startAt(lastNode).limitToFirst(ITEM_LOAD_COUNT);
+                mainPageAdapter.showLoader();
+            }
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    mainPageAdapter.removeLoader();
+                    refreshLayout.setRefreshing(false);
+                    List<Prayer> prayers = new ArrayList<>();
+                    if (dataSnapshot.getChildrenCount() > 0) {
+                        for (DataSnapshot prayerSnapshot : dataSnapshot.getChildren()) {
+                            Prayer prayer = prayerSnapshot.getValue(Prayer.class);
+                            prayer.setId(prayerSnapshot.getKey());
+                            prayers.add(prayer);
+                        }
+                        lastNode = prayers.get(prayers.size() - 1).getId();
+                        if (!lastNode.equals(lastKey))
+                            prayers.remove(prayers.size() - 1);
+                        else
+                            lastNode = "end";
+                        isLoading = false;
+                        mainPageAdapter.addAll(prayers);
+                    } else {
+                        isLoading = false;
+                        isMaxData = true;
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    refreshLayout.setRefreshing(false);
+                    mainPageAdapter.removeLoader();
+                    isLoading = false;
+                }
+            });
+        }
     }
 
 
