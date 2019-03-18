@@ -155,7 +155,7 @@ public class TransactionsFragment extends Fragment implements Listerners.Transac
             if (paymentPresenter == null)
                 paymentPresenter = new PaymentPresenter(getContext(), transactions, paymentListener, null);
             else
-                paymentPresenter.setNewTransaction(transactions);
+                paymentPresenter.setNewTransaction(transactions, null);
 
             //TransactionProcessDialogFragment.NewInstance(transactions, u).show(ft, "verify");
             MainActivity.showPaymentProcessDialog(getContext(), paymentPresenter);

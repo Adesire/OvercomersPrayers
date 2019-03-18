@@ -137,7 +137,22 @@ public class PaymentPresenter {
         Toast.makeText(mContext, "adding prayer to user", Toast.LENGTH_SHORT).show();
         Map<String, Object> map = new HashMap<>();
         map.put("prayerId", transactions.getPrayerId());
-        reference.child("userprayer").child(user.getUid()).child(transactions.getPrayerId()).updateChildren(selectedPrayer.toMap()).addOnCompleteListener(task -> endTransaction(true, null));
+        if (selectedPrayer == null) {
+            reference.child("prayer").child(transactions.getPrayerId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    selectedPrayer = dataSnapshot.getValue(Prayer.class);
+                    reference.child("userprayer").child(user.getUid()).child(transactions.getPrayerId()).updateChildren(selectedPrayer.toMap()).addOnCompleteListener(task -> endTransaction(true, null));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        } else {
+            reference.child("userprayer").child(user.getUid()).child(transactions.getPrayerId()).updateChildren(selectedPrayer.toMap()).addOnCompleteListener(task -> endTransaction(true, null));
+        }
     }
 
     public void endTransaction(boolean wasSuccessful, String message) {
@@ -150,7 +165,8 @@ public class PaymentPresenter {
         });
     }
 
-    public void setNewTransaction(Transactions transactions) {
+    public void setNewTransaction(Transactions transactions, Prayer selectedPrayer) {
         this.transactions = transactions;
+        this.selectedPrayer = selectedPrayer;
     }
 }

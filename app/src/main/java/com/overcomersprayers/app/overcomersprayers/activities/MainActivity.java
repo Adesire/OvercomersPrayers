@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         if (paymentPresenter == null) {
             paymentPresenter = new PaymentPresenter(this, transactions, this, currentPrayerSelected);
         } else
-            paymentPresenter.setNewTransaction(transactions);
+            paymentPresenter.setNewTransaction(transactions, currentPrayerSelected);
         progressDialog.setMessage("Initializing transaction, Please wait...");
         progressDialog.show();
         paymentPresenter.initializePayment();
@@ -344,6 +344,11 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     public void onPaymentCompleted(boolean wasSuccessful, String message) {
         if (wasSuccessful) {
+            if (fragmentManager.getBackStackEntryCount() > 0) {
+                fragmentManager.popBackStack();
+                PrayerPageFragment.X = 1;
+                replaceFragmentContent(PrayerPageFragment.newInstance(currentPrayerSelected), true);
+            }
             gifImageView.setImageResource(R.drawable.praise);
             paymentStatusTextView.setText(getString(R.string.payment_successful));
         } else {
