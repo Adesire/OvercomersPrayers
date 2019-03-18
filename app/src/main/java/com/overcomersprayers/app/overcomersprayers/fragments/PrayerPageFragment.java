@@ -10,7 +10,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,6 +59,8 @@ public class PrayerPageFragment extends Fragment {
     List<Prayer> favouritedPrayers = new ArrayList<>();
     private DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
     Prayer p;
+    boolean isFavourite;
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
 
     public static int X;
@@ -97,6 +104,7 @@ public class PrayerPageFragment extends Fragment {
             scripturesText = "No Scripture reference";
         }
         if (X == 0) {
+            favourite.setVisibility(View.GONE);
             scriptures.setText(scripturesText);
             bool.putBoolean("IS_LOCKED", true);
 
@@ -110,9 +118,31 @@ public class PrayerPageFragment extends Fragment {
         toolbarTitle.setText(prayerHeadingString);
         toolbarTitle.setSelected(true);
         getPrayerPoints(p);
+        getIsFavourite();
 
         onFavouriteClicked();
     }
+
+    private void getIsFavourite() {
+        rootRef.child("userFavourite").child(user.getUid()).child(p.getId()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    isFavourite = true;
+                    favourite.setImageDrawable(getResources().getDrawable(android.R.drawable.btn_star_big_on));
+                } else {
+                    isFavourite = false;
+                    favourite.setImageDrawable(getResources().getDrawable(android.R.drawable.btn_star_big_off));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
     @OnClick(R.id.view_more)
     public void initPayment() {
@@ -141,7 +171,28 @@ public class PrayerPageFragment extends Fragment {
     }
 
     private void onFavouriteClicked() {
-        favourite.setOnClickListener(view -> Log.e("TAG", "favourite clicked"));
+        favourite.setOnClickListener(view -> {
+            if (isFavourite) {
+                rootRef.child("userFavourite").child(user.getUid()).child(p.getId()).setValue(null).addOnCompleteListener(task -> {
+                    if (task.isSuccessful())
+                        Toast.makeText(getContext(), "Prayer removed from favourites", Toast.LENGTH_SHORT).show();
+                    else {
+                        Toast.makeText(getContext(), "" + task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                rootRef.child("userFavourite").child(user.getUid()).child(p.getId()).updateChildren(p.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful())
+                            Toast.makeText(getContext(), "Prayer added to favourites", Toast.LENGTH_SHORT).show();
+                        else {
+                            Toast.makeText(getContext(), "" + task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override

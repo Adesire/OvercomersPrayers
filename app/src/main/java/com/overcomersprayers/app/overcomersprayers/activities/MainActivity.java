@@ -152,9 +152,15 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
 
         setToolbarTitle(getString(R.string.app_name));
         fragmentManager.addOnBackStackChangedListener(() -> {
-            if (fragmentManager.getBackStackEntryCount() < 1)
+            if (fragmentManager.getBackStackEntryCount() < 1) {
                 setToolbarTitle(getString(R.string.app_name));
-            toggleBottomNavVisibility();
+                navigationView.setVisibility(View.VISIBLE);
+                params.setMargins(0, 0, 0, marginBottomInDp);
+            } else {
+                navigationView.setVisibility(View.GONE);
+                params.setMargins(0, 0, 0, 0);
+            }
+            mainView.setLayoutParams(params);
 
         });
 
@@ -241,14 +247,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
 
 
     private void toggleBottomNavVisibility() {
-        if (navigationView.getVisibility() == View.VISIBLE) {
-            navigationView.setVisibility(View.GONE);
-            params.setMargins(0, 0, 0, 0);
-        } else {
-            navigationView.setVisibility(View.VISIBLE);
-            params.setMargins(0, 0, 0, marginBottomInDp);
-        }
-        mainView.setLayoutParams(params);
+
     }
 
     @Override
@@ -431,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
     private void onFabClicked() {
-        replaceFragmentContent(PrayerFavouriteFragment.NewInstance(), true);
+        replaceFragmentContent(PrayerListFragment.NewInstance(true), true);
         circularReveal();
     }
 

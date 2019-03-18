@@ -21,6 +21,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
+import com.overcomersprayers.app.overcomersprayers.activities.MainActivity;
 import com.overcomersprayers.app.overcomersprayers.adapters.MainPageAdapter;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
 
@@ -46,6 +47,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     RecyclerView prayerHeadingList;
     @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout refreshLayout;
+    Bundle bundle;
     MainPageAdapter mainPageAdapter;
     Listerners.PrayerListener prayerListener;
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
@@ -54,6 +56,14 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
 
     public static PrayerListFragment NewInstance() {
         return new PrayerListFragment();
+    }
+
+    public static PrayerListFragment NewInstance(boolean isFav) {
+        PrayerListFragment prayerListFragment = new PrayerListFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("fav", isFav);
+        prayerListFragment.setArguments(bundle);
+        return prayerListFragment;
     }
 
     @Override
@@ -73,7 +83,12 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     }
 
     private void getPrayers() {
-        rootRef.child("userprayer").child(user.getUid()).addValueEventListener(new ValueEventListener() {
+        String table;
+        if (bundle != null) {
+            table = "userFavourite";
+        } else table = "userprayer";
+
+        rootRef.child(table).child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Prayer> prayers = new ArrayList<>();
@@ -101,6 +116,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main_content, container, false);
         ButterKnife.bind(this, view);
+        bundle = getArguments();
         return view;
     }
 
@@ -115,5 +131,18 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     public void onPrayerSearched(String query) {
         //Log.e("TAAAAG1", query);
         mainPageAdapter.getFilter().filter(query);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (bundle != null) {
+            getActivityCast().setToolbarTitle("My Favourites");
+        }
+
+    }
+
+    public MainActivity getActivityCast() {
+        return (MainActivity) getActivity();
     }
 }
