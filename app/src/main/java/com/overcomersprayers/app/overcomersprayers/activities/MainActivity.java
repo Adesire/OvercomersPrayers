@@ -19,7 +19,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     Toolbar mToolbar;
     @BindView(R.id.fab)
     FloatingActionButton fab;
+    Menu menu;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -226,6 +229,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
             Log.e(LOG_TAG, "user is null");
             navigationView.findViewById(R.id.navigation_dashboard).performClick();
         } else {
+            if (menu != null)
+                onPrepareOptionsMenu(menu);
             fab.setVisibility(View.VISIBLE);
             if (TextUtils.isEmpty(CURRENT_FRAGMENT)) {
                 Log.e(LOG_TAG, "onstart: replacing here");
@@ -375,14 +380,49 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         return true;
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        this.menu = menu;
+        MenuItem menuItem = this.menu.findItem(R.id.sign_button);
+        if (mUser == null) menuItem.setTitle("Sign In");
+        else menuItem.setTitle("Sign Out");
+
+        return true;
+    }
 
     public void signIn(MenuItem item) {
-        Intent intent = new Intent(this, LoginActivity.class);
-        if (item == null)
-            intent.putExtra(CASE, CASE_LOGIN_THEN_PAY);
-        else
-            intent.putExtra(CASE, CASE_LOGIN_NORMAL);
-        startActivityForResult(intent, LOGIN_REQUEST_CODE);
+        if (mUser == null) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            if (item == null)
+                intent.putExtra(CASE, CASE_LOGIN_THEN_PAY);
+            else
+                intent.putExtra(CASE, CASE_LOGIN_NORMAL);
+            startActivityForResult(intent, LOGIN_REQUEST_CODE);
+        } else {
+            AlertDialog.OnClickListener onClickListener = (dialog, which) -> {
+                switch (which) {
+                    case Dialog.BUTTON_POSITIVE:
+                        FirebaseAuth.getInstance().signOut();
+                        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                        navigationView.findViewById(R.id.navigation_dashboard).performClick();
+                        if (menu != null)
+                            onPrepareOptionsMenu(menu);
+                        break;
+                }
+                dialog.cancel();
+            };
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Sign Out")
+                    .setMessage("Are you sure you want to sign out")
+                    .setPositiveButton("Yes", onClickListener)
+                    .setNegativeButton("No", onClickListener);
+            AlertDialog dialog = builder.create();
+            dialog.setOnShowListener(dialog1 -> {
+                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.RED);
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.BLUE);
+            });
+            dialog.show();
+        }
     }
 
     private void onFabClicked() {
