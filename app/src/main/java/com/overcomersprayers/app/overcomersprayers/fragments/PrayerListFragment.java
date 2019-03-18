@@ -51,8 +51,6 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
     public static Listerners.SearchListener sSearchListener;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    Query query;
-    String lastKey;
 
     public static PrayerListFragment NewInstance() {
         return new PrayerListFragment();
@@ -68,14 +66,10 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
         prayerHeadingList.setAdapter(mainPageAdapter);
         refreshLayout.setOnRefreshListener(this::getPrayers);
         refreshLayout.setRefreshing(true);
-        getLastKey();
         getPrayers();
 //      prayerHeadingList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
 
-    }
-
-    private void getLastKey() {
     }
 
     private void getPrayers() {
