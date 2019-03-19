@@ -3,27 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/app_bar_search"
-        android:orderInCategory="10"
         android:icon="@drawable/ic_search_black_24dp"
+        android:orderInCategory="10"
         android:title="@string/search"
-        app:showAsAction="ifRoom"
-        app:actionViewClass="android.widget.SearchView" />
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/sign_button"
-        android:title="@string/action_sign_in"
-        app:showAsAction="never"
-        android:orderInCategory="20"
         android:background="?attr/selectableItemBackground"
         android:fontFamily="@font/montserrat"
-        android:onClick="signIn"/>
+        android:onClick="signIn"
+        android:orderInCategory="20"
+        android:title="@string/action_sign_in"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/app_info"
-        android:title="@string/info"
-        app:showAsAction="never"
-        android:orderInCategory="30"
         android:background="?attr/selectableItemBackground"
-        android:fontFamily="@font/montserrat"/>
+        android:fontFamily="@font/montserrat"
+        android:orderInCategory="30"
+        android:title="@string/info"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/app_share"
+        android:background="?attr/selectableItemBackground"
+        android:fontFamily="@font/montserrat"
+        android:orderInCategory="30"
+        android:onClick="share"
+        android:title="@string/share"
+        app:showAsAction="never" />
+
 
 </menu>

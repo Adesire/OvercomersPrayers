@@ -2,8 +2,6 @@ package com.overcomersprayers.app.overcomersprayers.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
 import com.overcomersprayers.app.overcomersprayers.activities.MainActivity;
-import com.overcomersprayers.app.overcomersprayers.activities.PrayerHeadingActivity;
 import com.overcomersprayers.app.overcomersprayers.adapters.PrayerPageAdapter;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
 
