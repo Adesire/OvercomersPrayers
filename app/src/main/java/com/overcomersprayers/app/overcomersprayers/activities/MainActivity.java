@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     Menu menu;
     boolean isChecked = true;
 
-    private static final String CHECK_BOX = "check_box" ;
+    private static final String CHECK_BOX = "check_box";
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -484,27 +485,26 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(mUser != null)
+        if (mUser != null)
             fab.setVisibility(View.VISIBLE);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id){
+        switch (id) {
             case R.id.turnOff:
                 isChecked = !item.isChecked();
                 userCheckPreference(isChecked);
                 item.setChecked(isChecked);
 
-                if(item.isChecked()){
+                if (item.isChecked()) {
                     userNotification(true);
-                    Toast.makeText(this,"Alarm On",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Alarm On", Toast.LENGTH_SHORT).show();
                     item.setTitle(R.string.turn_off_alarm);
-                }else{
+                } else {
                     userNotification(false);
-                    Toast.makeText(this,"Alarm Off",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Alarm Off", Toast.LENGTH_SHORT).show();
                     item.setTitle(R.string.turn_on_alarm);
                 }
 
@@ -514,33 +514,42 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
 
-    private void userCheckPreference(boolean v){
+    private void userCheckPreference(boolean v) {
         SharedPreferences checkbox = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = checkbox.edit();
-        editor.putBoolean(CHECK_BOX,v);
+        editor.putBoolean(CHECK_BOX, v);
         editor.apply();
     }
 
-    private boolean loadCheckboxValue(){
+    private boolean loadCheckboxValue() {
         SharedPreferences checkbox = PreferenceManager.getDefaultSharedPreferences(this);
-        return checkbox.getBoolean(CHECK_BOX,true);
+        return checkbox.getBoolean(CHECK_BOX, true);
     }
 
-    private  void userNotification(boolean a){
-        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+    private void userNotification(boolean a) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent notifyIntent = new Intent(this, PrayerReminder.class);
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY,8);
-        calendar.set(Calendar.MINUTE,0);
-        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.HOUR_OF_DAY, 8);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
 
-        if(a){
-            alarmManager.setRepeating(AlarmManager.RTC,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,notifyPendingIntent);
-        }else {
+        if (a) {
+            alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, notifyPendingIntent);
+        } else {
             alarmManager.cancel(notifyPendingIntent);
         }
+    }
 
+    public void share(MenuItem item) {
+        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                .setType("text/plain")
+                .setText("https://linktoapponplaystore.com")
+                .getIntent();
+        if (shareIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(shareIntent);
+        }
     }
 }

@@ -29,6 +29,7 @@
         android:id="@+id/app_share"
         android:background="?attr/selectableItemBackground"
         android:fontFamily="@font/montserrat"
+        android:onClick="share"
         android:orderInCategory="30"
         android:title="@string/share"
         app:showAsAction="never" />
@@ -36,9 +37,8 @@
 
     <item
         android:id="@+id/turnOff"
-        android:title="@string/turn_off_alarm"
+        android:checkable="true"
         android:orderInCategory="40"
-        app:showAsAction="never"
-        android:checkable="true"/>
-
+        android:title="@string/turn_off_alarm"
+        app:showAsAction="never" />
 </menu>
