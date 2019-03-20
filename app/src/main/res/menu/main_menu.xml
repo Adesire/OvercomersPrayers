@@ -26,4 +26,11 @@
         android:background="?attr/selectableItemBackground"
         android:fontFamily="@font/montserrat"/>
 
+    <item
+        android:id="@+id/turnOff"
+        android:title="@string/turn_off_alarm"
+        android:orderInCategory="40"
+        app:showAsAction="never"
+        android:checkable="true"/>
+
 </menu>
