@@ -40,5 +40,7 @@
     <string name="purchased">Purchased</string>
     <string name="payment_failed">This payment was unsuccessful</string>
     <string name="prayer_heading">Prayer Heading</string>
+    <string name="turn_off_alarm">Reminder On</string>
+    <string name="turn_on_alarm">Reminder Off</string>
     <string name="share">Share</string>
 </resources>

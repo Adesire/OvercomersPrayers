@@ -16,15 +16,19 @@ import pl.droidsonroids.gif.GifImageView;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -50,6 +54,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.overcomersprayers.app.overcomersprayers.AuthPresenter;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.PaymentPresenter;
+import com.overcomersprayers.app.overcomersprayers.PrayerReminder;
 import com.overcomersprayers.app.overcomersprayers.R;
 import com.overcomersprayers.app.overcomersprayers.fragments.PrayerFavouriteFragment;
 import com.overcomersprayers.app.overcomersprayers.fragments.PrayerListFragment;
@@ -60,6 +65,8 @@ import com.overcomersprayers.app.overcomersprayers.models.Prayer;
 import com.overcomersprayers.app.overcomersprayers.models.Transactions;
 
 import org.parceler.Parcels;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements Listerners.PrayerListener, Listerners.PaymentListener {
     public static final int LOGIN_REQUEST_CODE = 1099;
@@ -98,6 +105,9 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @BindView(R.id.fab)
     FloatingActionButton fab;
     Menu menu;
+    boolean isChecked = true;
+
+    private static final String CHECK_BOX = "check_box";
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -151,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         marginBottomInDp = (int) d * 56;
         params = (ConstraintLayout.LayoutParams) mainView.getLayoutParams();
         //mToolbar.setTitle(getString(R.string.app_name));
+        userNotification(true);
+        isChecked = loadCheckboxValue();
 
         setToolbarTitle(getString(R.string.app_name));
         fragmentManager.addOnBackStackChangedListener(() -> {
@@ -395,6 +407,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         MenuItem menuItem = this.menu.findItem(R.id.sign_button);
         if (mUser == null) menuItem.setTitle("Sign In");
         else menuItem.setTitle("Sign Out");
+        MenuItem checkable = menu.findItem(R.id.turnOff);
+        checkable.setChecked(isChecked);
         return true;
     }
 
@@ -470,6 +484,60 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         super.onBackPressed();
         if (mUser != null)
             fab.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.turnOff:
+                isChecked = !item.isChecked();
+                userCheckPreference(isChecked);
+                item.setChecked(isChecked);
+
+                if (item.isChecked()) {
+                    userNotification(true);
+                    Toast.makeText(this, "Alarm On", Toast.LENGTH_SHORT).show();
+                    item.setTitle(R.string.turn_off_alarm);
+                } else {
+                    userNotification(false);
+                    Toast.makeText(this, "Alarm Off", Toast.LENGTH_SHORT).show();
+                    item.setTitle(R.string.turn_on_alarm);
+                }
+
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private void userCheckPreference(boolean v) {
+        SharedPreferences checkbox = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = checkbox.edit();
+        editor.putBoolean(CHECK_BOX, v);
+        editor.apply();
+    }
+
+    private boolean loadCheckboxValue() {
+        SharedPreferences checkbox = PreferenceManager.getDefaultSharedPreferences(this);
+        return checkbox.getBoolean(CHECK_BOX, true);
+    }
+
+    private void userNotification(boolean a) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent notifyIntent = new Intent(this, PrayerReminder.class);
+        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 8);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        if (a) {
+            alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, notifyPendingIntent);
+        } else {
+            alarmManager.cancel(notifyPendingIntent);
+        }
     }
 
     public void share(MenuItem item) {
