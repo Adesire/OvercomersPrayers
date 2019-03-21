@@ -12,6 +12,7 @@ public interface Listerners {
         void onAuthFailed(String failureMessage);
 
         void onPasswordResetLinkSent();
+
     }
 
     interface PrayerListener {
@@ -29,6 +30,7 @@ public interface Listerners {
 
         void onPaymentCompleted(boolean wasSuccessful, String message);
     }
+
     interface TransactionsItemListener {
         void onTransactionItemClicked(Transactions transactions);
     }

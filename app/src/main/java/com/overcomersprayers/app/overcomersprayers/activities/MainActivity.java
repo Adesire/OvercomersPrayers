@@ -47,6 +47,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.overcomersprayers.app.overcomersprayers.AuthPresenter;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.PaymentPresenter;
 import com.overcomersprayers.app.overcomersprayers.R;
@@ -307,9 +308,11 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         String firstname = "";
         String lastName = "";
         if (displayName != null || !TextUtils.isEmpty(displayName)) {
-            String fullname[] = displayName.split(":::");
-            firstname = fullname[0];
-            lastName = fullname[1];
+            if (displayName.contains(" ")) {
+                String fullname[] = displayName.split(":::");
+                firstname = fullname[0];
+                lastName = fullname[1];
+            } else firstname = displayName;
         }
         if (progressDialog.isShowing())
             progressDialog.dismiss();
@@ -392,7 +395,6 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         MenuItem menuItem = this.menu.findItem(R.id.sign_button);
         if (mUser == null) menuItem.setTitle("Sign In");
         else menuItem.setTitle("Sign Out");
-
         return true;
     }
 
@@ -408,11 +410,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
             AlertDialog.OnClickListener onClickListener = (dialog, which) -> {
                 switch (which) {
                     case Dialog.BUTTON_POSITIVE:
-                        FirebaseAuth.getInstance().signOut();
-                        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                        navigationView.findViewById(R.id.navigation_dashboard).performClick();
-                        if (menu != null)
-                            onPrepareOptionsMenu(menu);
+                        signOut();
                         break;
                 }
                 dialog.cancel();
@@ -470,7 +468,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(mUser != null)
+        if (mUser != null)
             fab.setVisibility(View.VISIBLE);
     }
 
@@ -483,4 +481,17 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
             startActivity(shareIntent);
         }
     }
+
+    private void signOut() {
+        FirebaseAuth.getInstance().signOut();
+        AuthPresenter.getGoogleSignInClient(this).signOut().addOnCompleteListener(
+                task -> {
+                    mUser = null;
+                    fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    navigationView.findViewById(R.id.navigation_dashboard).performClick();
+                    if (menu != null)
+                        onPrepareOptionsMenu(menu);
+                });
+    }
+
 }

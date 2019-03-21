@@ -3,6 +3,7 @@ package com.overcomersprayers.app.overcomersprayers.fragments;
 
 import android.animation.Animator;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,6 +23,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
+import com.overcomersprayers.app.overcomersprayers.activities.LoginActivity;
 import com.overcomersprayers.app.overcomersprayers.activities.MainActivity;
 import com.overcomersprayers.app.overcomersprayers.adapters.MainPageAdapter;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
@@ -72,6 +75,12 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
         prayerHeadingList.setLayoutManager(new LinearLayoutManager(getContext()));
         if (mainPageAdapter == null) {
             mainPageAdapter = new MainPageAdapter(prayerListener, false);
+        }
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(getContext(), "Seems like your session expired, Please login again", Toast.LENGTH_SHORT).show();
+            getActivity().startActivity(new Intent(getContext(), LoginActivity.class));
+            return;
         }
         prayerHeadingList.setAdapter(mainPageAdapter);
         refreshLayout.setOnRefreshListener(this::getPrayers);
