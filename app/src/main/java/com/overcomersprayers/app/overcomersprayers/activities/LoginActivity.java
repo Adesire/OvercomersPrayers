@@ -59,12 +59,12 @@ import butterknife.ButterKnife;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, Listerners.AuthListener {
+public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, Listerners.AuthListener, View.OnClickListener{
 
     private static final int REQUEST_READ_CONTACTS = 0;
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    /*@BindView(R.id.email)
+    @BindView(R.id.email)
     AutoCompleteTextView mEmailView;
     @BindView(R.id.password)
     EditText mPasswordView;
@@ -75,7 +75,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @BindView(R.id.firstname)
     EditText mFirstNameView;
     @BindView(R.id.lastname)
-    EditText mLastNameView
+    EditText mLastNameView;
     @BindView(R.id.phone)
     EditText mPhoneView;
     @BindView(R.id.confirm_password_wrapper)
@@ -91,7 +91,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @BindView(R.id.no_account_button)
     TextView mNoAccountButton;
     @BindView(R.id.email_sign_in_button)
-    Button mEmailSignInButton;*/
+    Button mEmailSignInButton;
     boolean isSignIn = true;
     private AuthPresenter authPresenter;
     Intent i;
@@ -110,20 +110,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-        //populateAutoComplete();
-//        mForgotPasswordView.setOnClickListener(this);
-//        mNoAccountButton.setOnClickListener(this);
-//        mEmailSignInButton.setOnClickListener(this);
+        populateAutoComplete();
+        mForgotPasswordView.setOnClickListener(this);
+        mNoAccountButton.setOnClickListener(this);
+        mEmailSignInButton.setOnClickListener(this);
         FirebaseApp app = FirebaseApp.initializeApp(this);
         signInButton.setOnClickListener(this::googleSignIn);
         authPresenter = new AuthPresenter(this, this);
-        /*mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
+        mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                 validateFieldsAndAuth();
                 return true;
             }
             return false;
-        });*/
+        });
         i = getIntent();
         if (i != null) {
             casee = i.getIntExtra(MainActivity.CASE, MainActivity.CASE_DEFAULT);
@@ -133,13 +133,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     }
 
-    /*private void populateAutoComplete() {
+    private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
         }
 
         getLoaderManager().initLoader(0, null, this);
-    }*/
+    }
 
     @Override
     protected void onStart() {
@@ -163,7 +163,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    /*private boolean mayRequestContacts() {
+    private boolean mayRequestContacts() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
@@ -177,19 +177,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
         }
         return false;
-    }*/
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         if (requestCode == REQUEST_READ_CONTACTS) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //populateAutoComplete();
+                populateAutoComplete();
             }
         }
     }
 
-    /*private void validateFieldsAndAuth() {
+    private void validateFieldsAndAuth() {
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
@@ -266,7 +266,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         pattern = Pattern.compile(PASSWORD_PATTERN);
         matcher = pattern.matcher(password);
         return matcher.matches();
-    }*/
+    }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void toggleProgress(final boolean show) {
@@ -318,7 +318,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cursor.moveToNext();
         }
 
-        //addEmailsToAutoComplete(emails);
+        addEmailsToAutoComplete(emails);
     }
 
     @Override
@@ -326,16 +326,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     }
 
-    /*private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
+    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(LoginActivity.this,
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         mEmailView.setAdapter(adapter);
-    }*/
+    }
 
-    /*@Override
+    @Override
     public void onClick(View v) {
         ExtraUtils.hideKeyboard(this);
         switch (v.getId()) {
@@ -357,9 +357,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 toggleAuthForm();
                 break;
         }
-    }*/
+    }
 
-    /*private void toggleAuthForm() {
+    private void toggleAuthForm() {
         isSignIn = !isSignIn;
         mFirstNameWrapper.setVisibility(isSignIn ? View.GONE : View.VISIBLE);
         mLastNameWrapper.setVisibility(isSignIn ? View.GONE : View.VISIBLE);
@@ -368,7 +368,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mForgotPasswordView.setVisibility(isSignIn ? View.VISIBLE : View.GONE);
         mEmailSignInButton.setText(getString(isSignIn ? R.string.action_sign_in : R.string.sign_up));
         mNoAccountButton.setText(getString(isSignIn ? R.string.don_t_have_an_account : R.string.already_registered));
-    }*/
+    }
 
 
     @Override
@@ -391,7 +391,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     public void onPasswordResetLinkSent() {
         toggleProgress(false);
-        //Snackbar.make(mLoginFormView, "Password reset link sent to " + mEmailView.getText().toString(), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(mLoginFormView, "Password reset link sent to " + mEmailView.getText().toString(), Snackbar.LENGTH_LONG).show();
     }
 
     public void googleSignIn(View view) {

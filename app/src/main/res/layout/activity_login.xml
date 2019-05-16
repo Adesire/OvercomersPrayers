@@ -34,32 +34,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:src="@drawable/ic_overcomers_prayers"
-            app:layout_constraintBottom_toTopOf="@id/googleSignIn"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.36"
             app:layout_constraintVertical_chainStyle="packed" />
 
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/googleSignIn"
-            android:layout_width="wrap_content"
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/login_form1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/overcomers_logo">
-
-        </com.google.android.gms.common.SignInButton>
-
-
-        <!--<androidx.core.widget.NestedScrollView
-            android:layout_marginTop="16dp"
-            android:id="@+id/login_form"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/email_login_form"
@@ -67,10 +53,10 @@
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:layout_marginTop="16dp"
                     android:id="@+id/first_name_wrapper"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:visibility="gone"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -236,6 +222,18 @@
                     app:layout_constraintTop_toBottomOf="@id/no_account_button" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.core.widget.NestedScrollView>-->
+        </androidx.core.widget.NestedScrollView>
+
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/googleSignIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/login_form1">
+
+        </com.google.android.gms.common.SignInButton>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

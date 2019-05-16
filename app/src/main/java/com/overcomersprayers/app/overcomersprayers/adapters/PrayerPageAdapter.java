@@ -52,7 +52,6 @@ public class PrayerPageAdapter extends RecyclerView.Adapter<PrayerPageAdapter.Pr
     }
 
     class PrayerPageViewHolder extends RecyclerView.ViewHolder {
-
         @BindView(R.id.ppoint)
         TextView prayerPointTextview;
         @BindView(R.id.serial_number)

@@ -78,7 +78,7 @@ public class AuthPresenter {
                 });
     }
 
-    /*public void signIn(String email, String password) {
+    public void signIn(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String uid = task.getResult().getUser().getUid();
@@ -138,5 +138,5 @@ public class AuthPresenter {
                 mAuthListener.onAuthFailed(task.getException().getMessage());
         });
     }
-    */
+
 }
