@@ -10,8 +10,16 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.RelativeLayout;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
+import com.overcomersprayers.app.overcomersprayers.activities.MainActivity;
 import com.overcomersprayers.app.overcomersprayers.adapters.MainPageAdapter;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
 
@@ -25,6 +33,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.codetail.animation.ViewAnimationUtils;
@@ -33,8 +43,12 @@ public class PrayerFavouriteFragment extends Fragment {
 
     @BindView(R.id.prayerFavouriteList)
     RecyclerView prayerFavouriteList;
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout refreshLayout;
     MainPageAdapter mainPageAdapter;
     Listerners.PrayerListener prayerListener;
+    DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
 
     public static PrayerFavouriteFragment NewInstance() {
@@ -55,7 +69,34 @@ public class PrayerFavouriteFragment extends Fragment {
         prayerFavouriteList.setLayoutManager(new LinearLayoutManager(getContext()));
         mainPageAdapter = new MainPageAdapter(prayerListener, false);
         prayerFavouriteList.setAdapter(mainPageAdapter);
+        getPrayers();
     }
+
+
+    private void getPrayers() {
+        String table = "userFavourite";
+        rootRef.child(table).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<Prayer> prayers = new ArrayList<>();
+                if (dataSnapshot.getChildrenCount() > 0) {
+                    for (DataSnapshot prayerSnapshot : dataSnapshot.getChildren()) {
+                        Prayer prayer = prayerSnapshot.getValue(Prayer.class);
+                        prayer.setId(prayerSnapshot.getKey());
+                        prayers.add(prayer);
+                    }
+                }
+                refreshLayout.setRefreshing(false);
+                mainPageAdapter.swapData(prayers);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                refreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -63,7 +104,7 @@ public class PrayerFavouriteFragment extends Fragment {
         prayerListener = (Listerners.PrayerListener) context;
     }
 
-    private void revealFavourites(View view){
+    private void revealFavourites(View view) {
 
         RecyclerView infoContainer = prayerFavouriteList;
 
@@ -85,5 +126,16 @@ public class PrayerFavouriteFragment extends Fragment {
             });
             reveal.start();
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getActivityCast().setToolbarTitle("My Favourites");
+        getActivityCast().hideFavButton();
+    }
+
+    public MainActivity getActivityCast() {
+        return (MainActivity) getActivity();
     }
 }

@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#1976D2</color>
     <color name="colorAccent">#FFC107</color>
     <color name="colorPrimaryLight">#BBDEFB</color>
+    <color name="blurAccent">#80FFC107</color>
     <color name="red_50">#FFEBEE</color>
     <color name="red_100">#FFCDD2</color>
     <color name="red_200">#EF9A9A</color>

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.droidsonroids.gif.GifImageView;
@@ -186,6 +187,14 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         super.onResume();
     }
 
+    public void hideFavButton() {
+        fab.setVisibility(View.INVISIBLE);
+    }
+
+    public void showFavButton() {
+        fab.setVisibility(View.VISIBLE);
+    }
+
     private void replaceFragmentContent(Fragment fragment, boolean shouldAddBackStack) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.main_acivity_content, fragment);
@@ -260,11 +269,6 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         }
     }
 
-
-    private void toggleBottomNavVisibility() {
-
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -320,11 +324,18 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         String firstname = "";
         String lastName = "";
         if (displayName != null || !TextUtils.isEmpty(displayName)) {
-            if (displayName.contains(" ")) {
+            if (displayName.contains(":::")) {
                 String fullname[] = displayName.split(":::");
                 firstname = fullname[0];
                 lastName = fullname[1];
-            } else firstname = displayName;
+            } else if (displayName.contains(" ")) {
+                String fullname[] = displayName.split(" ");
+                firstname = fullname[0];
+                lastName = fullname[1];
+            } else {
+                firstname = displayName;
+                lastName = displayName;
+            }
         }
         if (progressDialog.isShowing())
             progressDialog.dismiss();
@@ -341,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                 .onStagingEnv(true)
                 .allowSaveCardFeature(true)
                 .acceptCardPayments(true)
+                .acceptAccountPayments(true)
                 .setNarration("Payment for prayer")
                 .withTheme(R.style.RaveTheme)
                 .initialize();
@@ -444,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
     private void onFabClicked() {
-        replaceFragmentContent(PrayerListFragment.NewInstance(true), true);
+        replaceFragmentContent(PrayerFavouriteFragment.NewInstance(), true);
         circularReveal();
     }
 
@@ -482,8 +494,6 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (mUser != null)
-            fab.setVisibility(View.VISIBLE);
     }
 
     @Override

@@ -61,14 +61,6 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
         return new PrayerListFragment();
     }
 
-    public static PrayerListFragment NewInstance(boolean isFav) {
-        PrayerListFragment prayerListFragment = new PrayerListFragment();
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("fav", isFav);
-        prayerListFragment.setArguments(bundle);
-        return prayerListFragment;
-    }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -92,10 +84,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     }
 
     private void getPrayers() {
-        String table;
-        if (bundle != null) {
-            table = "userFavourite";
-        } else table = "userprayer";
+        String table = "userprayer";
 
         rootRef.child(table).child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -145,10 +134,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     @Override
     public void onStart() {
         super.onStart();
-        if (bundle != null) {
-            getActivityCast().setToolbarTitle("My Favourites");
-        }
-
+        getActivityCast().showFavButton();
     }
 
     public MainActivity getActivityCast() {

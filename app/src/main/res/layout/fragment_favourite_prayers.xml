@@ -3,15 +3,24 @@
     android:id="@+id/favourite_layout"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/AppTheme.TransparentBG"
-    android:background="@color/colorAccent"
-    android:alpha="0.2">
+    android:layout_marginTop="56dp"
+    android:background="@color/blurAccent"
+    >
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/prayerFavouriteList"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
-        android:padding="4dp" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/prayerFavouriteList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="56dp"
+            android:padding="4dp" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
 
 </LinearLayout>

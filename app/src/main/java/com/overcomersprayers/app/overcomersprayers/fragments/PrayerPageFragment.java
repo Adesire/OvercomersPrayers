@@ -121,13 +121,14 @@ public class PrayerPageFragment extends Fragment {
         if(user != null){
             getIsFavourite();
             onFavouriteClicked();
-            favourite.setVisibility(View.VISIBLE);
+            if (X != 0)
+                favourite.setVisibility(View.VISIBLE);
         }
 
     }
 
     private void getIsFavourite() {
-        rootRef.child("userFavourite").child(user.getUid()).child(p.getId()).addValueEventListener(new ValueEventListener() {
+        rootRef.child("userFavourite").child(user.getUid()).child(p.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -176,6 +177,7 @@ public class PrayerPageFragment extends Fragment {
     private void onFavouriteClicked() {
         favourite.setOnClickListener(view -> {
             if (isFavourite) {
+                favourite.setImageDrawable(getResources().getDrawable(android.R.drawable.btn_star_big_off));
                 rootRef.child("userFavourite").child(user.getUid()).child(p.getId()).setValue(null).addOnCompleteListener(task -> {
                     if (task.isSuccessful())
                         Toast.makeText(getContext(), "Prayer removed from favourites", Toast.LENGTH_SHORT).show();
@@ -184,6 +186,7 @@ public class PrayerPageFragment extends Fragment {
                     }
                 });
             } else {
+                favourite.setImageDrawable(getResources().getDrawable(android.R.drawable.btn_star_big_on));
                 rootRef.child("userFavourite").child(user.getUid()).child(p.getId()).updateChildren(p.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,6 +18,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.overcomersprayers.app.overcomersprayers.Listerners;
 import com.overcomersprayers.app.overcomersprayers.R;
+import com.overcomersprayers.app.overcomersprayers.activities.MainActivity;
 import com.overcomersprayers.app.overcomersprayers.adapters.MainPageAdapter;
 import com.overcomersprayers.app.overcomersprayers.models.Prayer;
 
@@ -30,6 +32,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -82,11 +85,10 @@ public class PrayerStoreFragment extends Fragment implements Listerners.SearchLi
             }
         });
         prayerHeadingList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-
-
     }
 
     private void getLastKey() {
+        refreshLayout.setRefreshing(true);
         rootRef.child("prayer").orderByKey().limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -167,5 +169,16 @@ public class PrayerStoreFragment extends Fragment implements Listerners.SearchLi
     @Override
     public void onPrayerSearched(String query) {
         mainPageAdapter.getFilter().filter(query);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+            getActivityCast().showFavButton();
+    }
+
+    public MainActivity getActivityCast() {
+        return (MainActivity) getActivity();
     }
 }
