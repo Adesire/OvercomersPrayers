@@ -2,6 +2,7 @@ package com.overcomersprayers.app.overcomersprayers.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,17 +31,20 @@ import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PrayerPageFragment extends Fragment {
+public class PrayerPageFragment extends Fragment implements Listerners.TTSRequest {
 
     @BindView(R.id.scriptures)
     TextView scriptures;
@@ -67,6 +71,7 @@ public class PrayerPageFragment extends Fragment {
     Prayer p;
     boolean isFavourite;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    TextToSpeech defaultTTS;
 
 
     public static int X;
@@ -106,7 +111,7 @@ public class PrayerPageFragment extends Fragment {
         String instructions = p.getInstructions();
         String noteTxt = p.getNote();
 
-        Log.e("TAG",instructions+"\n"+noteTxt);
+        Log.e("TAG", instructions + "\n" + noteTxt);
 
         if (!(p.getScriptures().equals(""))) {
             scripturesText = p.getScriptures().substring(0, 20) + "...";
@@ -114,12 +119,12 @@ public class PrayerPageFragment extends Fragment {
             scripturesText = "No Scripture reference";
         }
 
-        if(instructions != null){
+        if (instructions != null) {
             instruction.setText(instructions);
             instruction.setVisibility(View.VISIBLE);
             instructionTag.setVisibility(View.VISIBLE);
         }
-        if(noteTxt != null){
+        if (noteTxt != null) {
             note.setText(noteTxt);
             noteTag.setVisibility(View.VISIBLE);
             note.setVisibility(View.VISIBLE);
@@ -135,7 +140,8 @@ public class PrayerPageFragment extends Fragment {
             viewMore.setVisibility(View.GONE);
         }
         prayerContentList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mPrayerPageAdapter = new PrayerPageAdapter(bool);
+        prayerContentList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        mPrayerPageAdapter = new PrayerPageAdapter(bool, this);
         prayerContentList.setAdapter(mPrayerPageAdapter);
         toolbarTitle.setText(prayerHeadingString);
         toolbarTitle.setSelected(true);
@@ -143,13 +149,19 @@ public class PrayerPageFragment extends Fragment {
 
         favourite.setVisibility(View.GONE);
 
-        if(user != null){
+        if (user != null) {
             getIsFavourite();
             onFavouriteClicked();
             if (X != 0)
                 favourite.setVisibility(View.VISIBLE);
         }
 
+        defaultTTS = new TextToSpeech(getContext(), status -> {
+            if (status != TextToSpeech.ERROR) {
+                defaultTTS.setLanguage(Locale.ENGLISH);
+                //defaultTTS.speak("hello", TextToSpeech.QUEUE_FLUSH, null);
+            }
+        });
     }
 
     private void getIsFavourite() {
@@ -187,12 +199,12 @@ public class PrayerPageFragment extends Fragment {
                     String value;
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         value = snapshot.getValue().toString();
-                        if(snapshot.hasChildren()){
-                            int i=0;
-                            for(DataSnapshot shot : snapshot.getChildren()){
+                        if (snapshot.hasChildren()) {
+                            int i = 0;
+                            for (DataSnapshot shot : snapshot.getChildren()) {
                                 value = shot.getValue().toString();
                                 prayerpoints.add(value);
-                                Log.e("TAAAAAAAAGGGGG",(i++)+"  "+value);
+                                Log.e("TAAAAAAAAGGGGG", (i++) + "  " + value);
 
                             }
                         }
@@ -241,5 +253,30 @@ public class PrayerPageFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         prayerListener = (Listerners.PrayerListener) context;
+    }
+
+    @Override
+    public void onTTSRequested(String textToSpeak) {
+        Toast.makeText(getContext(), "speaking", Toast.LENGTH_SHORT).show();
+        if (defaultTTS.isSpeaking())
+            defaultTTS.stop();
+        defaultTTS.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    @Override
+    public void onSmallClick(String textToSpeak) {
+        Toast.makeText(getContext(), "Long press to start speaking", Toast.LENGTH_SHORT).show();
+        if (defaultTTS.isSpeaking())
+            defaultTTS.stop();
+        defaultTTS.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (defaultTTS != null) {
+            defaultTTS.stop();
+            defaultTTS.shutdown();
+        }
     }
 }

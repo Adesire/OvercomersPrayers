@@ -30,6 +30,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     public static final String FRAGMENT_HOME = "home";
     public static final String FRAGMENT_TRANSACTION = "transaction";
     public static final String FRAGMENT_PRAYER_STORE = "prayer_store";
+    private static final int ACT_CHECK_TTS_DATA = 1101;
     @State
     public String CURRENT_FRAGMENT = "";
     FragmentManager fragmentManager = getSupportFragmentManager();
@@ -247,6 +249,12 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
     }
 
+    private void checkTTS() {
+        Intent ttsIntent = new Intent();
+        ttsIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(ttsIntent, ACT_CHECK_TTS_DATA);
+    }
+
     private void openPrayerHeadingActivity(Prayer prayer) {
         Intent intent = new Intent(this, PrayerHeadingActivity.class);
         intent.putExtra("PRAYER_POINTS", Parcels.wrap(prayer));
@@ -294,6 +302,18 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "You didn't login", Toast.LENGTH_SHORT).show();
             }
+        } else if (requestCode == ACT_CHECK_TTS_DATA) {
+            if (resultCode ==
+                    TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                // Data exists, so we instantiate the TTS engine
+                //mTTS = new TextToSpeech(this, this);
+            } else {
+                // Data is missing, so we start the TTS installation
+                // process
+                Intent installIntent = new Intent();
+                installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(installIntent);
+            }
         } else if (requestCode == RaveConstants.RAVE_REQUEST_CODE && data != null) {
             String message = data.getStringExtra("response");
             if (resultCode == RavePayActivity.RESULT_SUCCESS) {
@@ -307,7 +327,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         }
     }
 
-    public static void showPaymentProcessDialog(Context context, PaymentPresenter paymentPresenter) {
+    public static void showPaymentProcessDialog(Context context, PaymentPresenter
+            paymentPresenter) {
         alertDialogBuilder = new AlertDialog.Builder(context);
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.payment_verification_dialog, null, false);

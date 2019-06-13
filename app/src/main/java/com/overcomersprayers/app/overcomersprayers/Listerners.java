@@ -39,4 +39,9 @@ public interface Listerners {
         void onPrayerSearched(String query);
     }
 
+    interface TTSRequest{
+        void onTTSRequested(String textToSpeak);
+        void onSmallClick(String text);
+    }
+
 }
