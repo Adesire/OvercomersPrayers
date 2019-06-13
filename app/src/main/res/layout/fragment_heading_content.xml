@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
 
-    <include layout="@layout/app_toolbar" />
+    <include layout="@layout/app_toolbar"
+        android:id="@+id/tbar"/>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/details"
+        android:layout_below="@id/tbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
@@ -122,16 +125,37 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <ScrollView
+        android:id="@+id/pry52_scroll"
+        android:layout_below="@id/details"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/prayer52_txt"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:visibility="gone"/>
+    </ScrollView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/prayerContentList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:paddingLeft="16dp"
+        android:layout_below="@id/pry52_scroll"
         android:paddingRight="16dp" />
 
     <Button
         android:id="@+id/view_more"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -139,4 +163,4 @@
         android:elevation="4dp"
         android:text="View More ($0.99)" />
 
-</LinearLayout>
+</RelativeLayout>
