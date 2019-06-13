@@ -1,13 +1,19 @@
 package com.overcomersprayers.app.overcomersprayers.fragments;
 
 import android.content.Context;
+import android.graphics.BlurMaskFilter;
+import android.graphics.MaskFilter;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.MaskFilterSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +58,10 @@ public class PrayerPageFragment extends Fragment {
     TextView instructionTag;
     @BindView(R.id.noteTag)
     TextView noteTag;
+    @BindView(R.id.prayer52_txt)
+    TextView prayer52;
+    @BindView(R.id.pry52_scroll)
+    ScrollView prayer52Scroll;
     @BindView(R.id.prayerContentList)
     RecyclerView prayerContentList;
     @BindView(R.id.toolbar_title)
@@ -68,6 +78,7 @@ public class PrayerPageFragment extends Fragment {
     boolean isFavourite;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+    LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
 
     public static int X;
 
@@ -105,6 +116,8 @@ public class PrayerPageFragment extends Fragment {
         String scripturesText = "";
         String instructions = p.getInstructions();
         String noteTxt = p.getNote();
+        String prayer52Txt ="  "+ p.getPrayer52();
+        SpannableString prayer52TxtBlur = null;
 
         Log.e("TAG",instructions+"\n"+noteTxt);
 
@@ -124,17 +137,37 @@ public class PrayerPageFragment extends Fragment {
             noteTag.setVisibility(View.VISIBLE);
             note.setVisibility(View.VISIBLE);
         }
+        if(prayer52Txt != null){
+            if(prayer52Txt.contains("\\n")){
+                prayer52Txt = prayer52Txt.replace("\\n","\n\n");
+
+                prayer52TxtBlur = new SpannableString(prayer52Txt);
+                float radius = prayer52.getTextSize() / 3;
+                MaskFilter blur = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);
+                prayer52TxtBlur.setSpan(new MaskFilterSpan(blur), 100, 2443, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                Log.e("TAGGGGGTESTTTTTT",prayer52Txt.length()+"");
+
+                prayer52.setVisibility(View.VISIBLE);
+                prayer52Scroll.setVisibility(View.VISIBLE);
+                prayerContentList.setVisibility(View.GONE);
+            }
+        }
 
         if (X == 0) {
             favourite.setVisibility(View.GONE);
             scriptures.setText(scripturesText);
+            prayer52.setText(prayer52TxtBlur);
             bool.putBoolean("IS_LOCKED", true);
+
+            prayerContentList.setOnScrollListener(mScrollListener);
 
         } else {
             scriptures.setText(p.getScriptures());
+            prayer52.setText(prayer52Txt);
             viewMore.setVisibility(View.GONE);
         }
-        prayerContentList.setLayoutManager(new LinearLayoutManager(getContext()));
+        prayerContentList.setLayoutManager(mLayoutManager);
         mPrayerPageAdapter = new PrayerPageAdapter(bool);
         prayerContentList.setAdapter(mPrayerPageAdapter);
         toolbarTitle.setText(prayerHeadingString);
@@ -151,6 +184,20 @@ public class PrayerPageFragment extends Fragment {
         }
 
     }
+
+    RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            int visibleItemCount = mLayoutManager.getChildCount();
+            int totalItemCount = mLayoutManager.getItemCount();
+            int pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
+            if (pastVisibleItems + visibleItemCount >= totalItemCount) {
+                viewMore.setVisibility(View.INVISIBLE);
+            }else{
+                viewMore.setVisibility(View.VISIBLE);
+            }
+        }
+    };
 
     private void getIsFavourite() {
         rootRef.child("userFavourite").child(user.getUid()).child(p.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
