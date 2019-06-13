@@ -162,7 +162,7 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseVi
         public void bind(Prayer prayer) {
             super.bind(prayer);
             if (isPrayerStore) {
-                if (prayer.getId().equals("-LgwPAf4HSmnoh0U0nnc") || prayer.getId().equals("-LgwPAf5eKnCCsDTdxuF") || prayer.getId().equals("-LgwPAf5eKnCCsDTdxuG")) {
+                if (prayer.getId().equals("-Lh0ZHAi3AKMjCUqAB5o") || prayer.getId().equals("-Lh0ZHAjQzOzgiMWmnIO") || prayer.getId().equals("-Lh0ZHAjQzOzgiMWmnIP")) {
                     setCardListener(prayer);
                 } else {
                     checkUserAlreadyPurchased(prayer);
