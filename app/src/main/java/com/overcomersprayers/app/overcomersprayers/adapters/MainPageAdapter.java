@@ -162,7 +162,7 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseVi
         public void bind(Prayer prayer) {
             super.bind(prayer);
             if (isPrayerStore) {
-                if (prayer.getId().equals("-LZuCd9_DRH_FWurPmno") || prayer.getId().equals("-LZuCd9at4GXkUCAVAmf") || prayer.getId().equals("-LZuCd9bS47B0oLQqaNQ")) {
+                if (prayer.getId().equals("-LgwPAf4HSmnoh0U0nnc") || prayer.getId().equals("-LgwPAf5eKnCCsDTdxuF") || prayer.getId().equals("-LgwPAf5eKnCCsDTdxuG")) {
                     setCardListener(prayer);
                 } else {
                     checkUserAlreadyPurchased(prayer);
@@ -173,9 +173,16 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseVi
             String prayerHeadingString = prayer.getHeading().replace(". ", "");
             prayerHeadingString = prayerHeadingString.replace(".", "");
             prayerHeading.setText(prayerHeadingString);
-            if (prayer.getScriptures() != null) {
-                String scriptureCut = isPrayerStore ? prayer.getScriptures().substring(0, 20) + "...." : prayer.getScriptures();
+            String scripturePreview = prayer.getScriptures();
+            if (!(scripturePreview.equals(""))) {
+                if(prayer.getScriptures().length()<1){
+                    Log.e("BAD GUY",prayerHeadingString+"\n"+prayer.getScriptures());
+                }
+                String scriptureCut = isPrayerStore ? scripturePreview.substring(0, 20) + "...." : scripturePreview;
                 scriptureReference.setText(scriptureCut);
+            }else {
+                scripturePreview = "No Scripture reference";
+                scriptureReference.setText(scripturePreview);
             }
         }
 

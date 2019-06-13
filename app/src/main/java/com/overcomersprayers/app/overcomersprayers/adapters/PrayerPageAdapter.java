@@ -65,7 +65,7 @@ public class PrayerPageAdapter extends RecyclerView.Adapter<PrayerPageAdapter.Pr
         void bind(int position) {
             prayerPointTextview.setText(prayerPoints.get(position));
             serialNumber.setText(String.valueOf(position + 1));
-            if (a) {
+            /*if (a) {
                 if (position > 2) {
                     prayerPointTextview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
                     float radius = prayerPointTextview.getTextSize() / 3;
@@ -76,7 +76,7 @@ public class PrayerPageAdapter extends RecyclerView.Adapter<PrayerPageAdapter.Pr
                 }
             } else {
                 prayerPointTextview.getPaint().setMaskFilter(null);
-            }
+            }*/
         }
 
         void setBlurryText(int position) {

@@ -48,6 +48,7 @@ import com.evernote.android.state.State;
 import com.flutterwave.raveandroid.RaveConstants;
 import com.flutterwave.raveandroid.RavePayActivity;
 import com.flutterwave.raveandroid.RavePayManager;
+import com.flutterwave.raveandroid.responses.SubAccount;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -67,7 +68,9 @@ import com.overcomersprayers.app.overcomersprayers.models.Transactions;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Listerners.PrayerListener, Listerners.PaymentListener {
     public static final int LOGIN_REQUEST_CODE = 1099;
@@ -339,6 +342,10 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         }
         if (progressDialog.isShowing())
             progressDialog.dismiss();
+        SubAccount subAccount = new SubAccount();
+        subAccount.setId("RS_35F4308B327CF38CE30F74D58FA86D96");
+        List<SubAccount> subAccounts = new ArrayList<>();
+        subAccounts.add(subAccount);
         new RavePayManager(this)
                 .setAmount(transactions.getAmount())
                 .setCurrency("USD")
@@ -355,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                 .acceptAccountPayments(true)
                 .setNarration("Payment for prayer")
                 .withTheme(R.style.RaveTheme)
+                .setSubAccounts(subAccounts)
                 .initialize();
     }
 

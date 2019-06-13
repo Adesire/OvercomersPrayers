@@ -2,6 +2,7 @@ package com.overcomersprayers.app.overcomersprayers.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,6 +45,14 @@ public class PrayerPageFragment extends Fragment {
 
     @BindView(R.id.scriptures)
     TextView scriptures;
+    @BindView(R.id.instruction)
+    TextView instruction;
+    @BindView(R.id.note)
+    TextView note;
+    @BindView(R.id.instructTag)
+    TextView instructionTag;
+    @BindView(R.id.noteTag)
+    TextView noteTag;
     @BindView(R.id.prayerContentList)
     RecyclerView prayerContentList;
     @BindView(R.id.toolbar_title)
@@ -93,13 +103,29 @@ public class PrayerPageFragment extends Fragment {
         prayerHeadingString = prayerHeadingString.replace(".", "");
         getActivityCast().setToolbarTitle(prayerHeadingString);
 
+        String scripturesText = "";
+        String instructions = p.getInstructions();
+        String noteTxt = p.getNote();
 
-        String scripturesText = null;
-        if (p.getScriptures() != null) {
+        Log.e("TAG",instructions+"\n"+noteTxt);
+
+        if (!(p.getScriptures().equals(""))) {
             scripturesText = p.getScriptures().substring(0, 20) + "...";
         } else {
             scripturesText = "No Scripture reference";
         }
+
+        if(instructions != null){
+            instruction.setText(instructions);
+            instruction.setVisibility(View.VISIBLE);
+            instructionTag.setVisibility(View.VISIBLE);
+        }
+        if(noteTxt != null){
+            note.setText(noteTxt);
+            noteTag.setVisibility(View.VISIBLE);
+            note.setVisibility(View.VISIBLE);
+        }
+
         if (X == 0) {
             favourite.setVisibility(View.GONE);
             scriptures.setText(scripturesText);
@@ -159,8 +185,46 @@ public class PrayerPageFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     List<String> prayerpoints = new ArrayList<>();
+                    String value;
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        prayerpoints.add(snapshot.getValue().toString());
+                        value = snapshot.getValue().toString();
+                        if(snapshot.hasChildren()){
+                            int i=0;
+                            for(DataSnapshot shot : snapshot.getChildren()){
+                                value = shot.getValue().toString();
+                                prayerpoints.add(value);
+                                Log.e("TAAAAAAAAGGGGG",(i++)+"  "+value);
+
+                            }
+                            rootRef.addChildEventListener(new ChildEventListener() {
+                                @Override
+                                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                                    String values = dataSnapshot.getValue().toString();
+                                    prayerpoints.add(values);
+                                }
+
+                                @Override
+                                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                                }
+
+                                @Override
+                                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                                }
+
+                                @Override
+                                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                        prayerpoints.add(value);
                     }
 
                     mPrayerPageAdapter.swapData(prayerpoints);

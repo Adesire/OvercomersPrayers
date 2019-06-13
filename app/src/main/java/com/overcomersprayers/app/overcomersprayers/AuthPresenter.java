@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.flutterwave.raveandroid.responses.SubAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -136,6 +137,7 @@ public class AuthPresenter {
                 mAuthListener.onPasswordResetLinkSent();
             else
                 mAuthListener.onAuthFailed(task.getException().getMessage());
+
         });
     }
 

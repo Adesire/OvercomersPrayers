@@ -63,7 +63,19 @@ public class PrayerStoreFragment extends Fragment implements Listerners.SearchLi
         prayerHeadingList.setLayoutManager(layoutManager);
         if (mainPageAdapter == null) {
             mainPageAdapter = new MainPageAdapter(prayerListener, true);
+
         }
+        FirebaseDatabase.getInstance().getReference().child("prayer").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.e("ALl pr", ""+dataSnapshot.getChildrenCount());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         prayerHeadingList.setAdapter(mainPageAdapter);
         refreshLayout.setOnRefreshListener(() -> {
             isMaxData = false;
