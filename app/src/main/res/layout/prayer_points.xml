@@ -28,6 +28,7 @@
         android:fontFamily="@font/montserrat"
         android:padding="8dp"
         android:text="First Point"
+        android:textColor="@color/black"
         android:textSize="18sp"
         android:textStyle="bold" />
 
