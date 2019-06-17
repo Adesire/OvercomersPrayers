@@ -5,7 +5,7 @@
     <string name="action_sign_in">Sign in</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password weak me</string>
+    <string name="error_invalid_password">This password is weak</string>
     <string name="error_invalid_password_toast">Password should contain at least one uppercase letter and one number</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
@@ -34,7 +34,7 @@
     <string name="prayer_store">Prayer Store</string>
     <string name="my_prayers">My Prayers</string>
     <string name="info">Info</string>
-    <string name="scripture_references">Scripture references</string>
+    <string name="scripture_references">Scripture References</string>
     <string name="preview">Preview</string>
     <string name="default_notification_channel_id">Auto Notifications</string>
     <string name="purchased">Purchased</string>

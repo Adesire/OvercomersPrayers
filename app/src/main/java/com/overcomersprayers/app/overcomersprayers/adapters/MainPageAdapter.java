@@ -181,9 +181,12 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseVi
                 String scriptureCut = isPrayerStore ? scripturePreview.substring(0, 20) + "...." : scripturePreview;
                 scriptureReference.setText(scriptureCut);
             }else {
-                scripturePreview = "No Scripture reference";
+                scripturePreview = "No Scripture Reference";
                 scriptureReference.setText(scripturePreview);
             }
+
+            purchase.setText(prayer.getHeading().equals("SELF-DELIVERANCE PRAYERS")? "$4.99" : "$1.05");
+
         }
 
         private void checkUserAlreadyPurchased(Prayer prayer) {

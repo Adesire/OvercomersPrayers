@@ -131,7 +131,7 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
         if (!(p.getScriptures().equals(""))) {
             scripturesText = p.getScriptures().substring(0, 20) + "...";
         } else {
-            scripturesText = "No Scripture reference";
+            scripturesText = "No Scripture Reference";
         }
 
         if (instructions != null) {
@@ -153,7 +153,7 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
                 MaskFilter blur = new BlurMaskFilter(radius, BlurMaskFilter.Blur.NORMAL);
                 prayer52TxtBlur.setSpan(new MaskFilterSpan(blur), 100, 2443, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                Log.e("TAGGGGGTESTTTTTT",prayer52Txt.length()+"");
+                //Log.e("TAGGGGGTESTTTTTT",prayer52Txt.length()+"");
 
                 prayer52.setVisibility(View.VISIBLE);
                 prayer52Scroll.setVisibility(View.VISIBLE);
@@ -165,12 +165,13 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
             favourite.setVisibility(View.GONE);
             scriptures.setText(scripturesText);
             prayer52.setText(prayer52TxtBlur);
+            viewMore.setText(p.getHeading().equals("SELF-DELIVERANCE PRAYERS")? "View More ($4.99)" : "View More ($1.05)");
             bool.putBoolean("IS_LOCKED", true);
 
             prayerContentList.setOnScrollListener(mScrollListener);
 
         } else {
-            scriptures.setText(p.getScriptures());
+            scriptures.setText(p.getScriptures().equals("")? "No Scripture reference" : p.getScriptures());
             prayer52.setText(prayer52Txt);
             viewMore.setVisibility(View.GONE);
         }

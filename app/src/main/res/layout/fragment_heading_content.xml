@@ -161,6 +161,6 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="8dp"
         android:elevation="4dp"
-        android:text="View More ($0.99)" />
+        android:text="View More ($1.05)" />
 
 </RelativeLayout>

@@ -9,14 +9,12 @@ import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.RecyclerView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import pl.droidsonroids.gif.GifImageView;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -39,7 +37,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import android.view.ViewAnimationUtils;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -217,16 +214,17 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     public void onPurchaseInitialized(Prayer prayer) {
         currentPrayerSelected = prayer;
+        double amount = prayer.getHeading().equals("SELF-DELIVERANCE PRAYERS")? 4.99 : 1.05;
         if (mUser == null) {
             signIn(null);
         } else
-            initializePayment();
+            initializePayment(amount);
 
 
     }
 
-    private void initializePayment() {
-        transactions = new Transactions("", 1, currentPrayerSelected.getId());
+    private void initializePayment(double amount) {
+        transactions = new Transactions("", amount, currentPrayerSelected.getId());
         transactions.setPrayerHeading(currentPrayerSelected.getHeading());
         if (paymentPresenter == null) {
             paymentPresenter = new PaymentPresenter(this, transactions, this, currentPrayerSelected);
@@ -289,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                 if (data != null) {
                     int a = data.getIntExtra(CASE, CASE_DEFAULT);
                     if (a == CASE_LOGIN_THEN_PAY)
-                        initializePayment();
+                        initializePayment(currentPrayerSelected.getHeading().equals("SELF-DELIVERANCE PRAYERS")? 4.99 : 1.05);
                     else if (a == CASE_LOGIN_NORMAL) {
                         Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
                     } else
@@ -335,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         gifImageView = view.findViewById(R.id.loading_image);
         paymentStatusTextView = view.findViewById(R.id.status_text_view);
         alertDialogBuilder.setCancelable(false)
-                .setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss());
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
         alertDialogBuilder.setView(view);
         alertDialog = alertDialogBuilder.create();
         alertDialog.show();
@@ -363,10 +361,10 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         }
         if (progressDialog.isShowing())
             progressDialog.dismiss();
-        SubAccount subAccount = new SubAccount();
+        /*SubAccount subAccount = new SubAccount();
         subAccount.setId("RS_35F4308B327CF38CE30F74D58FA86D96");
         List<SubAccount> subAccounts = new ArrayList<>();
-        subAccounts.add(subAccount);
+        subAccounts.add(subAccount);*/
         new RavePayManager(this)
                 .setAmount(transactions.getAmount())
                 .setCurrency("USD")
@@ -375,15 +373,14 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                 .setlName(lastName)
                 .setEmail(mUser.getEmail())
                 .setTxRef(key)
-                .setEncryptionKey("FLWSECK_TEST0963fcaa831e")
-                .setPublicKey("FLWPUBK_TEST-3d6789e869a4b16248acae3c1de9f649-X")
+                .setEncryptionKey("55c6bfd79a522461a61aa4c9"/*"72f1acf17cde1095ecb4d5fb" "FLWSECK_TEST0963fcaa831e"*/)
+                .setPublicKey("FLWPUBK-35bf065fb328e04781d024f9eceb2e02-X"/*"FLWPUBK-8ab041a894856e22ad20d9f65349feff-X"*//*"FLWPUBK_TEST-3d6789e869a4b16248acae3c1de9f649-X"*/)
                 .onStagingEnv(true)
                 .allowSaveCardFeature(true)
                 .acceptCardPayments(true)
                 .acceptAccountPayments(true)
                 .setNarration("Payment for prayer")
                 .withTheme(R.style.RaveTheme)
-                .setSubAccounts(subAccounts)
                 .initialize();
     }
 

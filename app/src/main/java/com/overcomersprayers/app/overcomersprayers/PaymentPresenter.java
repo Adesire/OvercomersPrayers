@@ -102,7 +102,7 @@ public class PaymentPresenter {
             jsonObject = new JSONObject();
             try {
                 jsonObject.put("txref", transactions.getTrxRef());
-                jsonObject.put("SECKEY", "FLWSECK_TEST-0f31c54c2fe862c29694c1cc45e27c12-X");
+                jsonObject.put("SECKEY","FLWSECK-55c6bfd79a52de578bf63a411a0ed309-X"/*"FLWSECK-72f1acf17cde44a8e85b861a8af957d6-X"*//*"FLWSECK_TEST-0f31c54c2fe862c29694c1cc45e27c12-X"*/);
             } catch (JSONException e) {
                 e.printStackTrace();
                 Toast.makeText(mContext, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();

@@ -17,10 +17,10 @@
             android:id="@+id/prayer_heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/cherry_cream_soda"
+            android:fontFamily="@font/montserrat_bold"
             android:paddingLeft="8dp"
             android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:paddingBottom="2dp"
             android:text="@string/prayer_heading"
             android:textSize="18sp" />
 
@@ -79,7 +79,7 @@
                 android:clickable="true"
                 android:drawableRight="@drawable/ic_file_download_black_24dp"
                 android:focusable="true"
-                android:text="$0.99"
+                android:text="$1.05"
                 android:textColor="#0000EE" />
 
             <ImageView

@@ -74,7 +74,7 @@ public class PrayerPageAdapter extends RecyclerView.Adapter<PrayerPageAdapter.Pr
             prayerPointTextview.setText(prayerPoints.get(position));
             serialNumber.setText(String.valueOf(position + 1));
             if (a) {
-                if (position > 2) {
+                if (position > 4) {
                     prayerPointTextview.setOnClickListener(null);
                     prayerPointTextview.setOnLongClickListener(null);
                     speaker.setVisibility(View.GONE);
