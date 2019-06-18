@@ -409,6 +409,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
             gifImageView.setVisibility(View.GONE);
             paymentStatusTextView.setText(message);
         }
+        //just to be able to push back
     }
 
 
