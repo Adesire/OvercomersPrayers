@@ -19,13 +19,13 @@
         android:title="@string/action_sign_in"
         app:showAsAction="never" />
 
-    <item
+    <!--<item
         android:id="@+id/app_info"
         android:background="?attr/selectableItemBackground"
         android:fontFamily="@font/montserrat"
         android:orderInCategory="30"
         android:title="@string/info"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
     <item
         android:id="@+id/app_share"
         android:background="?attr/selectableItemBackground"

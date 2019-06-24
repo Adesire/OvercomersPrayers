@@ -10,7 +10,7 @@ import retrofit2.http.POST;
 
 public interface RaveApi {
 
-    String BASE_URL = "https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/v2/";
+    String BASE_URL = "https://api.ravepay.co/flwv3-pug/getpaidx/api/v2/";
 
     @Headers("content-type: application/json")
     @POST("verify")

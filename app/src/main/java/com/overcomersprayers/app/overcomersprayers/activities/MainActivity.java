@@ -375,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                 .setTxRef(key)
                 .setEncryptionKey("55c6bfd79a522461a61aa4c9"/*"72f1acf17cde1095ecb4d5fb" "FLWSECK_TEST0963fcaa831e"*/)
                 .setPublicKey("FLWPUBK-35bf065fb328e04781d024f9eceb2e02-X"/*"FLWPUBK-8ab041a894856e22ad20d9f65349feff-X"*//*"FLWPUBK_TEST-3d6789e869a4b16248acae3c1de9f649-X"*/)
-                .onStagingEnv(true)
+                .onStagingEnv(false)
                 .allowSaveCardFeature(true)
                 .acceptCardPayments(true)
                 .acceptAccountPayments(true)
@@ -580,7 +580,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     public void share(MenuItem item) {
         Intent shareIntent = ShareCompat.IntentBuilder.from(this)
                 .setType("text/plain")
-                .setText("https://linktoapponplaystore.com")
+                .setText("http://play.google.com/store/apps/details?id=com.overcomersprayers.app.overcomersprayers")
                 .getIntent();
         if (shareIntent.resolveActivity(getPackageManager()) != null) {
             startActivity(shareIntent);
