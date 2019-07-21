@@ -24,7 +24,7 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -34,20 +34,32 @@
                     android:paddingLeft="8dp"
                     android:paddingTop="8dp"
                     android:text="@string/scripture_references"
-                    android:textSize="30sp"
-                    android:textStyle="bold" />
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"/>
 
                 <ImageView
                     android:id="@+id/favourite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
+                    android:layout_gravity="center|bottom"
                     android:layout_marginStart="16dp"
                     android:clickable="true"
                     android:drawableStart="@drawable/fav_toggle"
                     android:focusable="true"
                     android:paddingBottom="4dp"
                     app:srcCompat="@android:drawable/btn_star_big_off" />
+
+                <TextView
+                    android:id="@+id/add_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add Prayer"
+                    android:padding="4dp"
+                    android:layout_gravity="center|bottom"
+                    android:layout_marginLeft="4dp"/>
 
             </LinearLayout>
 

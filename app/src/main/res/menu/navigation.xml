@@ -11,9 +11,9 @@
         android:icon="@drawable/ic_shopping_cart_black_24dp"
         android:title="@string/prayer_store" />
 
-    <item
+    <!--<item
         android:id="@+id/navigation_notifications"
         android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/transactions" />
+        android:title="@string/transactions" />-->
 
 </menu>

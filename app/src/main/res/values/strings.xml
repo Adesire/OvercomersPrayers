@@ -31,7 +31,7 @@
     <string name="title_notifications">Notifications</string>
     <string name="shop">Shop</string>
     <string name="transactions">Transactions</string>
-    <string name="prayer_store">Prayer Store</string>
+    <string name="prayer_store">All Prayers</string>
     <string name="my_prayers">My Prayers</string>
     <string name="info">Info</string>
     <string name="scripture_references">Scripture References</string>
@@ -43,4 +43,6 @@
     <string name="turn_off_alarm">Reminder On</string>
     <string name="turn_on_alarm">Reminder Off</string>
     <string name="share">Share</string>
+    <string name="add_prayer">Add Prayer</string>
+    <string name="remove">Remove</string>
 </resources>
