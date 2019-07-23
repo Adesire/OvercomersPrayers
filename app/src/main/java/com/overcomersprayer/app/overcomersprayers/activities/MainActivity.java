@@ -65,9 +65,15 @@ import com.overcomersprayer.app.overcomersprayers.fragments.PrayerFavouriteFragm
 import com.overcomersprayer.app.overcomersprayers.fragments.PrayerListFragment;
 import com.overcomersprayer.app.overcomersprayers.fragments.PrayerPageFragment;
 import com.overcomersprayer.app.overcomersprayers.fragments.PrayerStoreFragment;
+import com.overcomersprayer.app.overcomersprayers.models.ListOfCategoriesWithHeading;
 import com.overcomersprayer.app.overcomersprayers.models.Prayer;
 import com.overcomersprayer.app.overcomersprayers.models.Transactions;
+import com.overcomersprayer.app.overcomersprayers.utils.AppExecutors;
+import com.overcomersprayer.app.overcomersprayers.utils.OpHelper;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.parceler.Parcels;
 
 import java.util.Calendar;
@@ -189,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         //fab.setOnClickListener(view -> onFabClicked());
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -219,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     public void onPurchaseInitialized(Prayer prayer) {
         currentPrayerSelected = prayer;
-        double amount = prayer.getHeading().equals("SELF-DELIVERANCE PRAYERS")? 4.99 : 1.05;
+        double amount = prayer.getHeading().equals("SELF-DELIVERANCE PRAYERS") ? 4.99 : 1.05;
         if (mUser == null) {
             signIn(null);
         } else
@@ -256,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
 
     @Override
     public void onCategoryClick(String cat) {
-        replaceFragmentContent(PrayerStoreFragment.NewInstance(),true);
+        replaceFragmentContent(PrayerStoreFragment.NewInstance(), true);
         categoryName = cat;
     }
 
@@ -266,8 +273,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         rootRef.child(categoryName).child(prayer.getId()).updateChildren(prayer.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                Log.e("PRAYERS re-arrange","Successful");
-                Toast.makeText(getApplicationContext(),"Successful Push to "+categoryName,Toast.LENGTH_LONG).show();
+                Log.e("PRAYERS re-arrange", "Successful");
+                Toast.makeText(getApplicationContext(), "Successful Push to " + categoryName, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -287,6 +294,8 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     protected void onStart() {
         super.onStart();
+        EventBus.getDefault().register(this);
+
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser == null) {
             fab.setVisibility(View.GONE);
@@ -304,6 +313,17 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void showData(ListOfCategoriesWithHeading listOfCategoriesWithHeading){
+        //Toast.makeText(this, ""+listOfCategoriesWithHeading.getCategoryWithHeadingsList(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_REQUEST_CODE) {
@@ -312,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                 if (data != null) {
                     int a = data.getIntExtra(CASE, CASE_DEFAULT);
                     if (a == CASE_LOGIN_THEN_PAY)
-                        initializePayment(currentPrayerSelected.getHeading().equals("SELF-DELIVERANCE PRAYERS")? 4.99 : 1.05);
+                        initializePayment(currentPrayerSelected.getHeading().equals("SELF-DELIVERANCE PRAYERS") ? 4.99 : 1.05);
                     else if (a == CASE_LOGIN_NORMAL) {
                         Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
                     } else
@@ -365,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         paymentPresenter.verifyPayment();
     }
 
-    public static void showWelcomeDialog(Context context){
+    public static void showWelcomeDialog(Context context) {
         alertDialogBuilder = new AlertDialog.Builder(context);
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.payment_verification_dialog, null, false);
@@ -610,7 +630,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
-        if (a && (Calendar.getInstance().getTime()==calendar.getTime())) {
+        if (a && (Calendar.getInstance().getTime() == calendar.getTime())) {
             alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, notifyPendingIntent);
         } else {
             alarmManager.cancel(notifyPendingIntent);
@@ -638,7 +658,6 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                         onPrepareOptionsMenu(menu);
                 });
     }
-
 
 
 }

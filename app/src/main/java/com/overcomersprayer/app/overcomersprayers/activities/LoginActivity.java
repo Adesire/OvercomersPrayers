@@ -45,8 +45,15 @@ import com.google.firebase.auth.FirebaseUser;
 import com.overcomersprayer.app.overcomersprayers.AuthPresenter;
 import com.overcomersprayer.app.overcomersprayers.Listerners;
 import com.overcomersprayer.app.overcomersprayers.R;
+import com.overcomersprayer.app.overcomersprayers.models.ListOfCategoriesWithHeading;
 import com.overcomersprayer.app.overcomersprayers.models.Users;
+import com.overcomersprayer.app.overcomersprayers.utils.AppExecutors;
 import com.overcomersprayer.app.overcomersprayers.utils.ExtraUtils;
+import com.overcomersprayer.app.overcomersprayers.utils.OpHelper;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +66,7 @@ import butterknife.ButterKnife;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, Listerners.AuthListener, View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, Listerners.AuthListener, View.OnClickListener {
 
     private static final int REQUEST_READ_CONTACTS = 0;
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -109,6 +116,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         ButterKnife.bind(this);
         populateAutoComplete();
         mForgotPasswordView.setOnClickListener(this);
@@ -144,9 +152,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     protected void onStart() {
         super.onStart();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            startActivity(new Intent(this, MainActivity.class));
             finish();
+        }
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

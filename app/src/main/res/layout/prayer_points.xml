@@ -20,11 +20,11 @@
         android:textStyle="bold" />
 
     <TextView
-        android:layout_marginTop="6dp"
         android:id="@+id/ppoint"
         android:layout_width="0dp"
-        android:layout_weight="1"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:layout_weight="1"
         android:fontFamily="@font/montserrat"
         android:padding="8dp"
         android:text="First Point"
@@ -34,9 +34,9 @@
 
     <ImageView
         android:id="@+id/speaker"
-        android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         app:srcCompat="@drawable/ic_megaphone" />
 
 </LinearLayout>
