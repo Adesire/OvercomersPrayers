@@ -23,6 +23,10 @@ public class Prayer {
     public Prayer() {
     }
 
+    public Prayer(String heading) {
+        this.heading = heading;
+    }
+
     public Prayer(boolean b) {
         this.isLoader = b;
     }
@@ -81,7 +85,7 @@ public class Prayer {
         map.put("scriptures", scriptures);
         map.put("instructions", instructions);
         map.put("Note", Note);
-        map.put("prayer52",prayer52);
+        map.put("prayer52", prayer52);
         map.put("Days", Days);
         return map;
     }

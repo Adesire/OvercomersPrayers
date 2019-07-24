@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                 else {
                     CURRENT_FRAGMENT = FRAGMENT_PRAYER_STORE;
                     showWelcomeDialog(this);
-                    replaceFragmentContent(CategoryFragment.newInstance(this)/*PrayerStoreFragment.NewInstance()*/, false);
+                    replaceFragmentContent(CategoryFragment.NewInstance()/*PrayerStoreFragment.NewInstance()*/, false);
                     return true;
                 }
             /*case R.id.navigation_notifications:
@@ -268,6 +268,11 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
     @Override
+    public void onCategoryItemClicked(Prayer prayer) {
+        replaceFragmentContent(PrayerPageFragment.newInstance(prayer), true);
+    }
+
+    @Override
     public void addToNewClick(Prayer prayer) {
         //Log.e("PRAYERS re-arrange","Successful");
         rootRef.child(categoryName).child(prayer.getId()).updateChildren(prayer.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -312,6 +317,10 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         }
     }
 
+    public void goToCategoryFrag() {
+        navigationView.findViewById(R.id.navigation_dashboard).performClick();
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -319,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void showData(ListOfCategoriesWithHeading listOfCategoriesWithHeading){
+    public void showData(ListOfCategoriesWithHeading listOfCategoriesWithHeading) {
         //Toast.makeText(this, ""+listOfCategoriesWithHeading.getCategoryWithHeadingsList(), Toast.LENGTH_LONG).show();
     }
 

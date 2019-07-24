@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/prayer_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:elevation="3dp"
-    app:cardCornerRadius="4dp">
+    android:layout_margin="8dp">
 
-    <Button
+    <ImageButton
         android:id="@+id/addToNew"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ADD"
-        android:layout_gravity="bottom|end"/>
+        android:layout_gravity="end|center"
+        android:background="?attr/selectableItemBackground"
+        android:visibility="visible"
+        app:srcCompat="@drawable/ic_keyboard_arrow_right" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,10 +24,11 @@
             android:id="@+id/prayer_heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat_bold"
-            android:paddingLeft="8dp"
+            android:fontFamily="@font/montserrat"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:paddingTop="8dp"
-            android:paddingBottom="2dp"
+            android:paddingBottom="8dp"
             android:text="@string/prayer_heading"
             android:textSize="18sp" />
 
@@ -45,19 +46,20 @@
             android:paddingLeft="8dp"
             android:paddingBottom="8dp"
             android:text="@string/scripture_references"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/purchased"
-            android:visibility="gone"
-            android:drawablePadding="8dp"
-            android:drawableEnd="@drawable/ic_check_black_24dp"
-            android:layout_marginStart="8dp"
-            android:fontFamily="@font/montserrat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:drawableEnd="@drawable/ic_check_black_24dp"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/montserrat"
             android:text="@string/purchased"
-            android:textColor="@color/accent" />
+            android:textColor="@color/accent"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -65,7 +67,8 @@
             android:layout_gravity="start"
             android:layout_marginStart="4dp"
             android:orientation="horizontal"
-            android:paddingStart="8dp">
+            android:paddingStart="8dp"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/preview"
@@ -101,4 +104,4 @@
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

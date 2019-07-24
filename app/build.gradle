@@ -33,6 +33,13 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/ASL2.0'
     }
+
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            def appName = "Overcomers Prayers"
+            outputFileName = appName + " - (version ${variant.versionName}).apk"
+        }
+    }
 }
 
 

@@ -1,5 +1,6 @@
 package com.overcomersprayer.app.overcomersprayers.adapters;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -27,7 +29,9 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -149,26 +153,32 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseVi
         @BindView(R.id.purchase)
         TextView purchase;
         @BindView(R.id.prayer_card)
-        CardView card;
+        CoordinatorLayout card;
         @BindView(R.id.purchased)
         TextView purchasedTextView;
         @BindView(R.id.addToNew)
-        Button addBtn;
+        ImageButton imageButton;
 
 
         public MainPageViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            card.setBackgroundColor(Color.WHITE);
+            RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) card.getLayoutParams();
+            layoutParams.setMargins(0, 0, 0, 0);
+            scriptureReference.setVisibility(View.VISIBLE);
+            imageButton.setVisibility(View.GONE);
+            card.setLayoutParams(layoutParams);
         }
 
         public void bind(Prayer prayer) {
             super.bind(prayer);
-            addBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    prayerListener.addToNewClick(prayer);
-                }
-            });
+//            addBtn.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    prayerListener.addToNewClick(prayer);
+//                }
+//            });
             if (isPrayerStore) {
                 /*if (prayer.getId().equals("-Lh0ZHAi3AKMjCUqAB5o") || prayer.getId().equals("-Lh0ZHAjQzOzgiMWmnIO") || prayer.getId().equals("-Lh0ZHAjQzOzgiMWmnIP")) {
                     setCardListener(prayer);
@@ -183,17 +193,17 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseVi
             prayerHeading.setText(prayerHeadingString);
             String scripturePreview = prayer.getScriptures();
             if (!(scripturePreview.equals(""))) {
-                if(prayer.getScriptures().length()<1){
-                    Log.e("BAD GUY",prayerHeadingString+"\n"+prayer.getScriptures());
+                if (prayer.getScriptures().length() < 1) {
+                    Log.e("BAD GUY", prayerHeadingString + "\n" + prayer.getScriptures());
                 }
                 String scriptureCut = isPrayerStore ? scripturePreview.substring(0, 20) + "...." : scripturePreview;
                 scriptureReference.setText(scriptureCut);
-            }else {
+            } else {
                 scripturePreview = "No Scripture Reference";
                 scriptureReference.setText(scripturePreview);
             }
 
-            purchase.setText(prayer.getHeading().equals("SELF-DELIVERANCE PRAYERS")? "$4.99" : "$1.05");
+            purchase.setText(prayer.getHeading().equals("SELF-DELIVERANCE PRAYERS") ? "$4.99" : "$1.05");
 
         }
 

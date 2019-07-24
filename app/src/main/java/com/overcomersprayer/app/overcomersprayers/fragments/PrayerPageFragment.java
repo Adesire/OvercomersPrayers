@@ -1,5 +1,6 @@
 package com.overcomersprayer.app.overcomersprayers.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.BlurMaskFilter;
 import android.graphics.MaskFilter;
@@ -82,12 +83,15 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
     Listerners.PrayerListener prayerListener;
     List<Prayer> favouritedPrayers = new ArrayList<>();
     private DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-    Prayer p;
+    Prayer pray;
     boolean isFavourite;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     TextToSpeech defaultTTS;
 
     LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
+    Bundle bool;
+    ProgressDialog progressDialog;
+    private Context mContext;
 
     public static int X;
 
@@ -114,23 +118,56 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Bundle bool = new Bundle();
+        bool = new Bundle();
         Bundle b = getArguments();
+        X = 1;
 
-        p = Parcels.unwrap(b.getParcelable("PRAYER_OBJECT"));
-        String prayerHeadingString = p.getHeading().replace(". ", "");
+        progressDialog = new ProgressDialog(mContext);
+        progressDialog.setMessage("Please Wait");
+        progressDialog.show();
+        pray = Parcels.unwrap(b.getParcelable("PRAYER_OBJECT"));
+        String prayerHeadingString = pray.getHeading().replace(". ", "");
         prayerHeadingString = prayerHeadingString.replace(".", "");
         getActivityCast().setToolbarTitle(prayerHeadingString);
+        if (pray.getScriptures() != null)
+            fillUpViews(pray);
+        else
+            getFullPrayer();
+    }
 
+    private void getFullPrayer() {
+        rootRef.child("prayer").orderByChild("heading").equalTo(pray.getHeading()).limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Prayer prayer = snapshot.getValue(Prayer.class);
+                    if (prayer != null) {
+                        prayer.setId(snapshot.getKey());
+                        pray = prayer;
+                        fillUpViews(prayer);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                progressDialog.dismiss();
+                Toast.makeText(mContext, "error " + databaseError.getDetails(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void fillUpViews(Prayer p) {
+        progressDialog.dismiss();
         String scripturesText = "";
         String instructions = p.getInstructions();
         String noteTxt = p.getNote();
-        String prayer52Txt ="  "+ p.getPrayer52();
+        String prayer52Txt = "  " + p.getPrayer52();
         SpannableString prayer52TxtBlur = null;
 
         Log.e("TAG", instructions + "\n" + noteTxt);
 
-        if (!(p.getScriptures().equals(""))) {
+        if (p.getScriptures() != null && !(p.getScriptures().equals(""))) {
             scripturesText = p.getScriptures().substring(0, 20) + "...";
         } else {
             scripturesText = "No Scripture Reference";
@@ -146,9 +183,9 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
             noteTag.setVisibility(View.VISIBLE);
             note.setVisibility(View.VISIBLE);
         }
-        if(prayer52Txt != null){
-            if(prayer52Txt.contains("\\n")){
-                prayer52Txt = prayer52Txt.replace("\\n","\n\n");
+        if (prayer52Txt != null) {
+            if (prayer52Txt.contains("\\n")) {
+                prayer52Txt = prayer52Txt.replace("\\n", "\n\n");
 
                 prayer52TxtBlur = new SpannableString(prayer52Txt);
                 float radius = prayer52.getTextSize() / 3;
@@ -167,13 +204,13 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
             favourite.setVisibility(View.GONE);
             scriptures.setText(scripturesText);
             prayer52.setText(prayer52TxtBlur);
-            viewMore.setText(p.getHeading().equals("SELF-DELIVERANCE PRAYERS")? "View More ($4.99)" : "View More ($1.05)");
+            viewMore.setText(p.getHeading().equals("SELF-DELIVERANCE PRAYERS") ? "View More ($4.99)" : "View More ($1.05)");
             bool.putBoolean("IS_LOCKED", false);
 
             prayerContentList.setOnScrollListener(mScrollListener);
 
         } else {
-            scriptures.setText(p.getScriptures().equals("")? "No Scripture reference" : p.getScriptures());
+            scriptures.setText(p.getScriptures().equals("") ? "No Scripture reference" : p.getScriptures());
             prayer52.setText(prayer52Txt);
             viewMore.setVisibility(View.GONE);
         }
@@ -181,15 +218,15 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
         prayerContentList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         mPrayerPageAdapter = new PrayerPageAdapter(bool, this);
         prayerContentList.setAdapter(mPrayerPageAdapter);
-        toolbarTitle.setText(prayerHeadingString);
+        //toolbarTitle.setText(prayerHeadingString);
         toolbarTitle.setSelected(true);
         getPrayerPoints(p);
 
         favourite.setVisibility(View.GONE);
 
         if (user != null) {
-            getIsFavourite();
-            onFavouriteClicked();
+            getIsFavourite(p);
+            onFavouriteClicked(p);
             if (X != 0)
                 favourite.setVisibility(View.VISIBLE);
         }
@@ -210,13 +247,13 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
             int pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
             if (pastVisibleItems + visibleItemCount >= totalItemCount) {
                 viewMore.setVisibility(View.INVISIBLE);
-            }else{
+            } else {
                 viewMore.setVisibility(View.VISIBLE);
             }
         }
     };
 
-    private void getIsFavourite() {
+    private void getIsFavourite(Prayer p) {
         String table = "userprayer";
         rootRef.child(table/*"userFavourite"*/).child(user.getUid()).child(p.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -242,7 +279,7 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
 
     @OnClick(R.id.view_more)
     public void initPayment() {
-        prayerListener.onPurchaseInitialized(p);
+        prayerListener.onPurchaseInitialized(pray);
     }
 
     private void getPrayerPoints(Prayer p) {
@@ -277,16 +314,15 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
         });
     }
 
-    private void onFavouriteClicked() {
+    private void onFavouriteClicked(Prayer p) {
         favourite.setOnClickListener(view -> {
             if (isFavourite) {
                 favourite.setImageDrawable(getResources().getDrawable(android.R.drawable.btn_star_big_off));
                 rootRef.child("userprayer"/*"userFavourite"*/).child(user.getUid()).child(p.getId()).setValue(null).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         addText.setText(getString(R.string.add_prayer));
                         Toast.makeText(getContext(), "Prayer removed from my prayers", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
+                    } else {
                         Toast.makeText(getContext(), "" + task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -295,11 +331,10 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
                 rootRef.child("userprayer"/*"userFavourite"*/).child(user.getUid()).child(p.getId()).updateChildren(p.toMap()).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             addText.setText(getString(R.string.remove));
                             Toast.makeText(getContext(), "Prayer added to my prayers", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
+                        } else {
                             Toast.makeText(getContext(), "" + task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -312,6 +347,7 @@ public class PrayerPageFragment extends Fragment implements Listerners.TTSReques
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         prayerListener = (Listerners.PrayerListener) context;
+        mContext = context;
     }
 
     @Override

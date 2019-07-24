@@ -24,6 +24,8 @@ public interface Listerners {
 
         void onCategoryClick(String cat);
 
+        void onCategoryItemClicked(Prayer prayer);
+
         void addToNewClick(Prayer prayer);
     }
 
@@ -43,9 +45,11 @@ public interface Listerners {
         void onPrayerSearched(String query);
     }
 
-    interface TTSRequest{
+    interface TTSRequest {
         void onTTSRequested(String textToSpeak);
+
         void onSmallClick(String text);
     }
+
 
 }

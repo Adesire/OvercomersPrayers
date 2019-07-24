@@ -1,7 +1,9 @@
 package com.overcomersprayer.app.overcomersprayers.fragments;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,15 +52,15 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     private static final String LOG_TAG = PrayerListFragment.class.getSimpleName();
     private static final String MOTION_X_ARG = null;
     private static final String MOTION_Y_ARG = null;
-    private ListOfCategoriesWithHeading listOfCategoriesWithHeading;
     @BindView(R.id.prayerHeadingList)
     RecyclerView prayerHeadingList;
     @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout refreshLayout;
     Bundle bundle;
-    ExpandableCategoriesAdapter mainPageAdapter;
+    MainPageAdapter mainPageAdapter;
     Listerners.PrayerListener prayerListener;
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+    private Context mContext;
     public static Listerners.SearchListener sSearchListener;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -70,12 +72,16 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         prayerHeadingList.setLayoutManager(new LinearLayoutManager(getContext()));
+        if (mainPageAdapter == null) {
+            mainPageAdapter = new MainPageAdapter(prayerListener, true);
+        }
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             Toast.makeText(getContext(), "Seems like your session expired, Please login again", Toast.LENGTH_SHORT).show();
             getActivity().startActivity(new Intent(getContext(), LoginActivity.class));
             return;
         }
+        prayerHeadingList.setAdapter(mainPageAdapter);
         refreshLayout.setOnRefreshListener(this::getPrayers);
         refreshLayout.setRefreshing(true);
         getPrayers();
@@ -84,46 +90,38 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
 
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
-
     private void getPrayers() {
-        if (listOfCategoriesWithHeading == null){
-            Toast.makeText(getContext(), "list is null", Toast.LENGTH_LONG).show();
-            Log.e("logd,", "null list");
-            refreshLayout.setRefreshing(false);
-            return;
-        }
+        String table = "userprayer";
 
-        mainPageAdapter = new ExpandableCategoriesAdapter(listOfCategoriesWithHeading.getCategoryWithHeadingsList());
-        prayerHeadingList.setAdapter(mainPageAdapter);
-        refreshLayout.setRefreshing(false);
+        rootRef.child(table).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<Prayer> prayers = new ArrayList<>();
+                if (dataSnapshot.getChildrenCount() > 0) {
+                    for (DataSnapshot prayerSnapshot : dataSnapshot.getChildren()) {
+                        Prayer prayer = prayerSnapshot.getValue(Prayer.class);
+                        prayer.setId(prayerSnapshot.getKey());
+                        prayers.add(prayer);
+                    }
+                }
+                refreshLayout.setRefreshing(false);
+                mainPageAdapter.swapData(prayers);
+                if (mainPageAdapter.getItemCount() < 1) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
+                            .setMessage("You have not bookmarked any prayers")
+                            .setTitle("Nothing here")
+                            .setPositiveButton("See all prayers", (dialog, which) -> {
+                                getActivityCast().goToCategoryFrag();
+                            });
+                    builder.show();
+                }
+            }
 
-//        String table = "userprayer";
-//
-//        rootRef.child(table).child(user.getUid()).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                List<Prayer> prayers = new ArrayList<>();
-//                if (dataSnapshot.getChildrenCount() > 0) {
-//                    for (DataSnapshot prayerSnapshot : dataSnapshot.getChildren()) {
-//                        Prayer prayer = prayerSnapshot.getValue(Prayer.class);
-//                        prayer.setId(prayerSnapshot.getKey());
-//                        prayers.add(prayer);
-//                    }
-//                }
-//                refreshLayout.setRefreshing(false);
-//                mainPageAdapter.swapData(prayers);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                refreshLayout.setRefreshing(false);
-//            }
-//        });
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                refreshLayout.setRefreshing(false);
+            }
+        });
     }
 
 
@@ -141,30 +139,21 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
         super.onAttach(context);
         prayerListener = (Listerners.PrayerListener) context;
         sSearchListener = this;
+        mContext = context;
     }
 
     @Override
     public void onPrayerSearched(String query) {
         //Log.e("TAAAAG1", query);
-        //mainPageAdapter.getFilter().filter(query);
+        mainPageAdapter.getFilter().filter(query);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
-        AppExecutors.getInstance().diskIO().execute(() -> {
-            OpHelper.readOpDoc(getContext());
-        });
         //getActivityCast().showFavButton();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void showData(ListOfCategoriesWithHeading listOfCategoriesWithHeading){
-        //Toast.makeText(getContext(), ""+listOfCategoriesWithHeading.getCategoryWithHeadingsList(), Toast.LENGTH_LONG).show();
-        this.listOfCategoriesWithHeading = listOfCategoriesWithHeading;
-        getPrayers();
-    }
     public MainActivity getActivityCast() {
         return (MainActivity) getActivity();
     }
