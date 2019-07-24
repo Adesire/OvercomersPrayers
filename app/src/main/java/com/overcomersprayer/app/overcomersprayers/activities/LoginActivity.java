@@ -390,6 +390,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             resultData.putExtra(MainActivity.CASE, casee);
             setResult(RESULT_OK, resultData);
         }
+        startActivity(new Intent(this, MainActivity.class));
         finish();
     }
 

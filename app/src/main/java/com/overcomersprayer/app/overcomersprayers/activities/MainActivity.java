@@ -299,8 +299,6 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     protected void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
-
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser == null) {
             fab.setVisibility(View.GONE);
@@ -324,7 +322,6 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     @Override
     protected void onStop() {
         super.onStop();
-        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
