@@ -1,6 +1,5 @@
 package com.overcomersprayer.app.overcomersprayers.adapters;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +7,6 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
 
 import com.overcomersprayer.app.overcomersprayers.Listerners;
 import com.overcomersprayer.app.overcomersprayers.R;
@@ -21,7 +18,6 @@ import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder;
 
-import java.util.Collection;
 import java.util.List;
 
 import butterknife.BindView;

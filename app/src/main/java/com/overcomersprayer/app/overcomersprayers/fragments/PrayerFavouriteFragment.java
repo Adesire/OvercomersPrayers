@@ -63,7 +63,7 @@ public class PrayerFavouriteFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         prayerFavouriteList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mainPageAdapter = new MainPageAdapter(prayerListener, false);
+        mainPageAdapter = new MainPageAdapter(prayerListener, false, new MainPageAdapter.PrayerDiffUtil());
         prayerFavouriteList.setAdapter(mainPageAdapter);
         getPrayers();
     }
@@ -83,7 +83,7 @@ public class PrayerFavouriteFragment extends Fragment {
                     }
                 }
                 refreshLayout.setRefreshing(false);
-                mainPageAdapter.swapData(prayers);
+                mainPageAdapter.submitList(prayers);
             }
 
             @Override

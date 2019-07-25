@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     FloatingActionButton fab;
     Menu menu;
     boolean isChecked = true;
+    MenuItem searchItem;
 
     private static final String CHECK_BOX = "check_box";
 
@@ -479,11 +480,19 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
 
+    public void hideSearchMenu(){
+        searchItem.setVisible(false);
+    }
+
+    public void showSearchMenu(){
+        searchItem.setVisible(true);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem item = menu.findItem(R.id.app_bar_search);
-        SearchView searchView = (SearchView) item.getActionView();
+        searchItem = menu.findItem(R.id.app_bar_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint("Search Prayers");
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

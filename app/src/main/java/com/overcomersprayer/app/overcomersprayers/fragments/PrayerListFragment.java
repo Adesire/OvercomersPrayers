@@ -73,7 +73,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
         super.onViewCreated(view, savedInstanceState);
         prayerHeadingList.setLayoutManager(new LinearLayoutManager(getContext()));
         if (mainPageAdapter == null) {
-            mainPageAdapter = new MainPageAdapter(prayerListener, true);
+            mainPageAdapter = new MainPageAdapter(prayerListener, true, new MainPageAdapter.PrayerDiffUtil());
         }
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
@@ -105,7 +105,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
                     }
                 }
                 refreshLayout.setRefreshing(false);
-                mainPageAdapter.swapData(prayers);
+                mainPageAdapter.submitList(prayers);
                 if (mainPageAdapter.getItemCount() < 1) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
                             .setMessage("You have not bookmarked any prayers")

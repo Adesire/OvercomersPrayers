@@ -145,6 +145,9 @@ public class CategoryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main_content, container, false);
         ButterKnife.bind(this, view);
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            OpHelper.readOpDoc(getContext());
+        });
         bundle = getArguments();
         return view;
     }
@@ -153,15 +156,19 @@ public class CategoryFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         prayerListener = (Listerners.PrayerListener) context;
+        getActivityCast().hideSearchMenu();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        getActivityCast().showSearchMenu();
     }
 
     @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        AppExecutors.getInstance().diskIO().execute(() -> {
-            OpHelper.readOpDoc(getContext());
-        });
         //getActivityCast().showFavButton();
     }
 

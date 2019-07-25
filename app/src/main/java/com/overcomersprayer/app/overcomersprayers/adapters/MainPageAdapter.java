@@ -28,17 +28,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseViewHolder> implements Filterable {
+public class MainPageAdapter extends ListAdapter<Prayer, MainPageAdapter.BaseViewHolder> implements Filterable {
 
     private static final String LOG_TAG = MainPageAdapter.class.getSimpleName();
-    public List<Prayer> prayerList;
+    //public List<Prayer> prayerList;
     Listerners.PrayerListener prayerListener;
     CustomFilter filter;
     boolean isPrayerStore;
@@ -48,8 +51,9 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseVi
     private final int VIEW_TYPE_LOADING = 199;
     private boolean loaderVisible = false;
 
-    public MainPageAdapter(Listerners.PrayerListener prayerListener, boolean isPrayerStore) {
-        this.prayerList = new ArrayList<>();
+    public MainPageAdapter(Listerners.PrayerListener prayerListener, boolean isPrayerStore, PrayerDiffUtil prayerDiffUtil) {
+        super(prayerDiffUtil);
+        //this.prayerList = new ArrayList<>();
         this.prayerListener = prayerListener;
         this.isPrayerStore = isPrayerStore;
         this.mUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -75,72 +79,81 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseVi
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
         Prayer prayer;
         if (isPrayerStore)
-            prayer = prayerList.get(position);
+            prayer = getItem(position);
         else
-            prayer = prayerList.get(getItemCount() - position - 1);
+            prayer = getItem(getItemCount() - position - 1);
         if (!prayer.isLoader())
             holder.bind(prayer);
     }
 
     public void showLoader() {
         loaderVisible = true;
-        prayerList.add(new Prayer(true));
-        notifyItemInserted(prayerList.size() - 1);
+        getCurrentList().add(new Prayer(true));
+        submitList(getCurrentList());
+        //notifyItemInserted(prayerList.size() - 1);
     }
+
 
     public void removeLoader() {
         loaderVisible = false;
-        if (prayerList.size() < 1)
+        if (getItemCount() < 1)
             return;
-        int position = prayerList.size() - 1;
-        Prayer item = prayerList.get(position);
+        int position = getItemCount() - 1;
+        Prayer item = getItem(position);
         if (item != null) {
-            prayerList.remove(position);
-            notifyItemRemoved(position);
+            getCurrentList().remove(position);
+            submitList(getCurrentList());
+            //notifyItemRemoved(position);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        Prayer prayer = prayerList.get(position);
+        Prayer prayer = getItem(position);
         if (prayer.isLoader())
             return VIEW_TYPE_LOADING;
         else
             return VIEW_TYPE_PRAYER;
     }
 
-    @Override
-    public int getItemCount() {
-        return prayerList.size();
-    }
 
     public void clear() {
-        prayerList = new ArrayList<>();
-        notifyDataSetChanged();
+        // prayerList = new ArrayList<>();
+        submitList(new ArrayList<>());
     }
 
     public void addAll(List<Prayer> prayers) {
-        int initialSize = prayerList.size();
-        prayerList.addAll(prayers);
-        notifyItemRangeInserted(initialSize, prayers.size());
+        int initialSize = getCurrentList().size();
+        getCurrentList().addAll(prayers);
+        submitList(getCurrentList());
+        //notifyItemRangeInserted(initialSize, prayers.size());
 
     }
 
     public String getLastItemId() {
-        return prayerList.get(prayerList.size() - 1).getId();
+        return getCurrentList().get(getCurrentList().size() - 1).getId();
     }
 
-    public void swapData(List<Prayer> prayers) {
-        this.prayerList = prayers;
-        notifyDataSetChanged();
-    }
 
     @Override
     public Filter getFilter() {
         if (filter == null) {
-            filter = new CustomFilter(prayerList, this);
+            filter = new CustomFilter(getCurrentList(), this);
         }
         return filter;
+    }
+
+    public static class PrayerDiffUtil extends DiffUtil.ItemCallback<Prayer> {
+
+        @Override
+        public boolean areItemsTheSame(@NonNull Prayer oldItem, @NonNull Prayer newItem) {
+            return oldItem == newItem;
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Prayer oldItem, @NonNull Prayer newItem) {
+            return oldItem.getId().equals(newItem.getId());
+        }
     }
 
     class MainPageViewHolder extends BaseViewHolder {
@@ -165,7 +178,7 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.BaseVi
             ButterKnife.bind(this, itemView);
             card.setBackgroundColor(Color.WHITE);
             RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) card.getLayoutParams();
-            layoutParams.setMargins(0, 0, 0, 0);
+            layoutParams.setMargins(10, 20, 10, 0);
             scriptureReference.setVisibility(View.VISIBLE);
             imageButton.setVisibility(View.GONE);
             card.setLayoutParams(layoutParams);

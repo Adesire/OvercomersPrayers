@@ -72,7 +72,7 @@ public class PrayerStoreFragment extends Fragment implements Listerners.SearchLi
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         prayerHeadingList.setLayoutManager(layoutManager);
         if (mainPageAdapter == null) {
-            mainPageAdapter = new MainPageAdapter(prayerListener, true);
+            mainPageAdapter = new MainPageAdapter(prayerListener, true, new MainPageAdapter.PrayerDiffUtil());
 
         }
         FirebaseDatabase.getInstance().getReference().child("prayer").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -90,7 +90,7 @@ public class PrayerStoreFragment extends Fragment implements Listerners.SearchLi
         refreshLayout.setOnRefreshListener(() -> {
             isMaxData = false;
             lastNode = "";
-            mainPageAdapter = new MainPageAdapter(prayerListener, true);
+            mainPageAdapter = new MainPageAdapter(prayerListener, true, new MainPageAdapter.PrayerDiffUtil());
             getPrayers();
         });
         getLastKey();

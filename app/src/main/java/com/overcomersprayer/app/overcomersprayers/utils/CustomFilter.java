@@ -45,9 +45,7 @@ public class CustomFilter extends Filter {
 
     @Override
     protected void publishResults(CharSequence constraint, FilterResults results) {
-        adapter.prayerList = (List<Prayer>) results.values;
-        //REFRESH
-        adapter.notifyDataSetChanged();
+        adapter.submitList((List<Prayer>) results.values);
     }
 
     public CustomFilter(boolean isSearching) {
