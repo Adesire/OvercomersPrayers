@@ -18,6 +18,8 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 
+import com.github.javiersantos.piracychecker.PiracyChecker;
+import com.github.javiersantos.piracychecker.enums.InstallerID;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.SignInButton;
@@ -112,10 +114,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @BindView(R.id.googleSignIn)
     SignInButton signInButton;
 
+    private PiracyChecker mChecker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        //verify();
 
         ButterKnife.bind(this);
         populateAutoComplete();
@@ -429,6 +434,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onBackPressed();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //mChecker.destroy();
+    }
+
+    private void verify(){
+        mChecker = new PiracyChecker(this)
+                .enableGooglePlayLicensing("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAie9OX" +
+                        "gHswpBiPPaIR+LDVPWxEtFKPoG3FH6JJQGPF3gxEvkTstUKG1fwvtYaZ9wF8WkzVSXqsQG2L" +
+                        "nKYQNiWIvk929XbDHRyUpkOhALppIWqBMBCrhx0Xj26+vLd9VtHPMDVz3eqUdJGBWoVeuEN60U" +
+                        "BbUast/wFn74wTYPsKMJPfw/COXrv+8z+3ckOLIRo3Ucf/vmCGgYX40HPs5uk5MngpRima4ogjg" +
+                        "OXZ7+N+qPKgMs6K22423FzRUqLt+X+3Xzvvgyp1UzPbSBXQ5I0XjdZlzKmv7l3Pitul9ZEHrPR5" +
+                        "Wggz00qo5Sp7cImTwPg/suDdRT20KMB0b7qFA59ZQIDAQAB")
+        .enableInstallerId(InstallerID.GOOGLE_PLAY, InstallerID.AMAZON_APP_STORE);
+        mChecker.start();
+    }
 
 }
 

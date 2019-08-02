@@ -641,7 +641,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 8);
+        calendar.set(Calendar.HOUR_OF_DAY, 18);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 

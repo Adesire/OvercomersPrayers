@@ -18,7 +18,7 @@ android {
 //    }
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.overcomersprayers.app.overcomersprayers"
+        applicationId "com.overcomersprayer.app.overcomersprayers"
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
@@ -52,7 +52,7 @@ android {
 
     android.applicationVariants.all { variant ->
         variant.outputs.all {
-            def appName = "Overcomers Prayers"
+            def appName = "Overcomers' Prayers"
             outputFileName = appName + " - (version ${variant.versionName}).apk"
         }
     }
@@ -97,6 +97,5 @@ dependencies {
     implementation('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
         transitive = true;
     }
-
-
+    implementation 'com.github.javiersantos:PiracyChecker:1.2.5'
 }

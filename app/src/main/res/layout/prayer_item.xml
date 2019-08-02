@@ -30,7 +30,8 @@
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:text="@string/prayer_heading"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold"/>
 
         <View
             android:id="@+id/divider"
