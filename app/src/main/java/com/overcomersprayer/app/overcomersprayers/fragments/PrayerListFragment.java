@@ -63,6 +63,8 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     private Context mContext;
     public static Listerners.SearchListener sSearchListener;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private ValueEventListener valueEventListener;
+    private DatabaseReference favouriteRef;
 
     public static PrayerListFragment NewInstance() {
         return new PrayerListFragment();
@@ -84,16 +86,7 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
         prayerHeadingList.setAdapter(mainPageAdapter);
         refreshLayout.setOnRefreshListener(this::getPrayers);
         refreshLayout.setRefreshing(true);
-        getPrayers();
-//      prayerHeadingList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-
-
-    }
-
-    private void getPrayers() {
-        String table = "userprayer";
-
-        rootRef.child(table).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Prayer> prayers = new ArrayList<>();
@@ -121,7 +114,16 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 refreshLayout.setRefreshing(false);
             }
-        });
+        };
+//      prayerHeadingList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+
+
+    }
+
+    private void getPrayers() {
+        String table = "userprayer";
+        favouriteRef = rootRef.child(table).child(user.getUid());
+        favouriteRef.addValueEventListener(valueEventListener);
     }
 
 
@@ -151,7 +153,14 @@ public class PrayerListFragment extends Fragment implements Listerners.SearchLis
     @Override
     public void onStart() {
         super.onStart();
+        getPrayers();
         //getActivityCast().showFavButton();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        favouriteRef.removeEventListener(valueEventListener);
     }
 
     public MainActivity getActivityCast() {
