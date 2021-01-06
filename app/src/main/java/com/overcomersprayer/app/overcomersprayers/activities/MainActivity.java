@@ -10,6 +10,7 @@ import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.work.Data;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,6 +58,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.overcomersprayer.app.overcomersprayers.AuthPresenter;
 import com.overcomersprayer.app.overcomersprayers.Listerners;
+import com.overcomersprayer.app.overcomersprayers.NotifyWorker;
 import com.overcomersprayer.app.overcomersprayers.PaymentPresenter;
 import com.overcomersprayer.app.overcomersprayers.PrayerReminder;
 import com.overcomersprayer.app.overcomersprayers.R;
@@ -77,6 +79,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.parceler.Parcels;
 
 import java.util.Calendar;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements Listerners.PrayerListener, Listerners.PaymentListener {
     public static final int LOGIN_REQUEST_CODE = 1099;
@@ -117,11 +120,53 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     FloatingActionButton fab;
     Menu menu;
     boolean isChecked = true;
+    boolean isFirstTime = true;
     MenuItem searchItem;
 
     private static final String CHECK_BOX = "check_box";
+    private static final String FIRST_TIME = "first_time";
 
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        //FirebaseAuth.getInstance().signOut();
+        navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        setSupportActionBar(mToolbar);
+        progressDialog = new ProgressDialog(this);
+        d = getResources().getDisplayMetrics().density;
+        marginBottomInDp = (int) d * 56;
+        params = (ConstraintLayout.LayoutParams) mainView.getLayoutParams();
+        //mToolbar.setTitle(getString(R.string.app_name));
+        userNotification(true);
+        isChecked = loadCheckboxValue();
+
+        isFirstTime = loadFirstTimeValue();
+
+        Log.e("TAGGOO",isFirstTime+"");
+
+        setToolbarTitle(getString(R.string.app_name));
+        fragmentManager.addOnBackStackChangedListener(() -> {
+            if (fragmentManager.getBackStackEntryCount() < 1) {
+                setToolbarTitle(getString(R.string.app_name));
+                navigationView.setVisibility(View.VISIBLE);
+                params.setMargins(0, 0, 0, marginBottomInDp);
+            } else {
+                navigationView.setVisibility(View.GONE);
+                params.setMargins(0, 0, 0, 0);
+            }
+            mainView.setLayoutParams(params);
+
+        });
+
+        fab.setVisibility(View.GONE);
+        //fab.setOnClickListener(view -> onFabClicked());
+    }
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
@@ -145,7 +190,12 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
                     return false;
                 else {
                     CURRENT_FRAGMENT = FRAGMENT_PRAYER_STORE;
+                    firstTimeLoad(isFirstTime);
+                    Log.e("TAG",isFirstTime+"");
+                    if(isFirstTime){
                     showWelcomeDialog(this);
+                    isFirstTime = false;
+                    }
                     replaceFragmentContent(CategoryFragment.NewInstance()/*PrayerStoreFragment.NewInstance()*/, false);
                     return true;
                 }
@@ -160,42 +210,6 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         }
         return false;
     };
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        //FirebaseAuth.getInstance().signOut();
-        navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        setSupportActionBar(mToolbar);
-        progressDialog = new ProgressDialog(this);
-        d = getResources().getDisplayMetrics().density;
-        marginBottomInDp = (int) d * 56;
-        params = (ConstraintLayout.LayoutParams) mainView.getLayoutParams();
-        //mToolbar.setTitle(getString(R.string.app_name));
-        userNotification(true);
-        isChecked = loadCheckboxValue();
-
-        setToolbarTitle(getString(R.string.app_name));
-        fragmentManager.addOnBackStackChangedListener(() -> {
-            if (fragmentManager.getBackStackEntryCount() < 1) {
-                setToolbarTitle(getString(R.string.app_name));
-                navigationView.setVisibility(View.VISIBLE);
-                params.setMargins(0, 0, 0, marginBottomInDp);
-            } else {
-                navigationView.setVisibility(View.GONE);
-                params.setMargins(0, 0, 0, 0);
-            }
-            mainView.setLayoutParams(params);
-
-        });
-
-        fab.setVisibility(View.GONE);
-        //fab.setOnClickListener(view -> onFabClicked());
-    }
-
 
     @Override
     protected void onResume() {
@@ -317,6 +331,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
     }
 
     public void goToCategoryFrag() {
+        //isFirstTime = false;
         navigationView.findViewById(R.id.navigation_dashboard).performClick();
     }
 
@@ -494,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         searchItem = menu.findItem(R.id.app_bar_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setQueryHint("Search Prayers");
-
+        hideSearchMenu();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -635,21 +650,52 @@ public class MainActivity extends AppCompatActivity implements Listerners.Prayer
         return checkbox.getBoolean(CHECK_BOX, true);
     }
 
+    private void firstTimeLoad (boolean b){
+        SharedPreferences firstTime = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = firstTime.edit();
+        editor.putBoolean(FIRST_TIME, b);
+        editor.apply();
+    }
+
+    private boolean loadFirstTimeValue() {
+        SharedPreferences firstTime = PreferenceManager.getDefaultSharedPreferences(this);
+        return firstTime.getBoolean(FIRST_TIME, true);
+    }
+
     private void userNotification(boolean a) {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        /*AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent notifyIntent = new Intent(this, PrayerReminder.class);
-        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);*/
+
+        Calendar cal = Calendar.getInstance();
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 18);
+        calendar.set(Calendar.HOUR_OF_DAY, 8);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
-        if (a && (Calendar.getInstance().getTime() == calendar.getTime())) {
-            alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, notifyPendingIntent);
-        } else {
-            alarmManager.cancel(notifyPendingIntent);
+        String tag = generateKey();
+        int random = (int )(Math.random()* 20 + 1);
+        Data data = new Data.Builder().putInt("Notify",random).build();
+
+        if (calendar.before(cal)) {
+            calendar.add(Calendar.HOUR_OF_DAY, 24);
         }
+
+        long timDiff = calendar.getTimeInMillis() - cal.getTimeInMillis();
+
+        if (a) {
+            //alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, notifyPendingIntent);
+            NotifyWorker.scheduleReminder(timDiff,data,tag);
+        } else {
+            //alarmManager.cancel(notifyPendingIntent);
+            NotifyWorker.cancelReminder(tag);
+        }
+    }
+
+
+    private String generateKey(){
+        return UUID.randomUUID().toString();
     }
 
     public void share(MenuItem item) {

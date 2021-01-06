@@ -437,7 +437,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //mChecker.destroy();
+        mChecker.destroy();
     }
 
     private void verify(){
